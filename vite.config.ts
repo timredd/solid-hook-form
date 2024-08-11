@@ -1,5 +1,6 @@
-import { defineConfig } from 'vite';
-import solidPlugin from 'vite-plugin-solid';
+/// <reference types="vitest" />
+import { defineConfig } from 'vite'
+import solidPlugin from 'vite-plugin-solid'
 // import devtools from 'solid-devtools/vite';
 
 export default defineConfig({
@@ -17,4 +18,11 @@ export default defineConfig({
   build: {
     target: 'esnext',
   },
-});
+  // [Maybe only needed for SolidStart](https://docs.solidjs.com/guides/testing#solidstart-configuration)
+  resolve: {
+    conditions: ['development', 'browser'],
+  },
+  test: {
+    include: ['src/__tests__', '**/__tests__/**/*.(spec|test).ts?(x)'],
+  },
+})
