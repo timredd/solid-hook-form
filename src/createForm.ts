@@ -1,4 +1,4 @@
-import Solid, { createEffect, createSignal, on } from 'solid-js'
+import { createEffect, createSignal, on } from 'solid-js'
 
 import { createSubscribe } from './createSubscribe'
 import { createFormControl } from './logic/createFormControl'
