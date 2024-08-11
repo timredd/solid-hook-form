@@ -1,3 +1,5 @@
+import { mergeProps } from 'solid-js'
+
 import { EVENTS, VALIDATION_MODE } from '../constants'
 import {
   BatchFieldArrayUpdate,
@@ -42,7 +44,6 @@ import {
   WatchInternal,
   WatchObserver,
 } from '../types'
-import cloneObject from '../utils/cloneObject'
 import compact from '../utils/compact'
 import convertToArrayPayload from '../utils/convertToArrayPayload'
 import createSubject from '../utils/createSubject'
@@ -119,9 +120,9 @@ export function createFormControl<
   let _fields: FieldRefs = {}
   let _defaultValues =
     isObject(_options.defaultValues) || isObject(_options.values)
-      ? cloneObject(_options.defaultValues || _options.values) || {}
+      ? mergeProps(_options.defaultValues || _options.values) || {}
       : {}
-  let _formValues = _options.shouldUnregister ? {} : cloneObject(_defaultValues)
+  let _formValues = _options.shouldUnregister ? {} : mergeProps(_defaultValues)
   let _state = {
     action: false,
     mount: false,
@@ -644,7 +645,7 @@ export function createFormControl<
   ) => {
     const field = get(_fields, name)
     const isFieldArray = _names.array.has(name)
-    const cloneValue = cloneObject(value)
+    const cloneValue = mergeProps(value)
 
     set(_formValues, name, cloneValue)
 
@@ -1129,7 +1130,7 @@ export function createFormControl<
         e.preventDefault && e.preventDefault()
         e.persist && e.persist()
       }
-      let fieldValues = cloneObject(_formValues)
+      let fieldValues = mergeProps(_formValues)
 
       _subjects.state.next({
         isSubmitting: true,
@@ -1180,7 +1181,7 @@ export function createFormControl<
   ) => {
     if (get(_fields, name)) {
       if (isUndefined(options.defaultValue)) {
-        setValue(name, cloneObject(get(_defaultValues, name)))
+        setValue(name, mergeProps(get(_defaultValues, name)))
       } else {
         setValue(
           name,
@@ -1189,7 +1190,7 @@ export function createFormControl<
             FieldPath<TFieldValues>
           >,
         )
-        set(_defaultValues, name, cloneObject(options.defaultValue))
+        set(_defaultValues, name, mergeProps(options.defaultValue))
       }
 
       if (!options.keepTouched) {
@@ -1199,7 +1200,7 @@ export function createFormControl<
       if (!options.keepDirty) {
         unset(_formState.dirtyFields, name)
         _formState.isDirty = options.defaultValue
-          ? _getDirty(name, cloneObject(get(_defaultValues, name)))
+          ? _getDirty(name, mergeProps(get(_defaultValues, name)))
           : _getDirty()
       }
 
@@ -1216,8 +1217,8 @@ export function createFormControl<
     formValues,
     keepStateOptions = {},
   ) => {
-    const updatedValues = formValues ? cloneObject(formValues) : _defaultValues
-    const cloneUpdatedValues = cloneObject(updatedValues)
+    const updatedValues = formValues ? mergeProps(formValues) : _defaultValues
+    const cloneUpdatedValues = mergeProps(updatedValues)
     const isEmptyResetValues = isEmptyObject(formValues)
     const values = isEmptyResetValues ? _defaultValues : cloneUpdatedValues
 
@@ -1260,9 +1261,9 @@ export function createFormControl<
 
       _formValues = props.shouldUnregister
         ? keepStateOptions.keepDefaultValues
-          ? cloneObject(_defaultValues)
+          ? mergeProps(_defaultValues)
           : {}
-        : cloneObject(values)
+        : mergeProps(values)
 
       _subjects.array.next({
         values: { ...values },

@@ -1,4 +1,4 @@
-import Solid, { on } from 'solid-js'
+import Solid, { mergeProps, on } from 'solid-js'
 
 import { VALIDATION_MODE } from './constants'
 import { createFormContext } from './createFormContext'
@@ -27,7 +27,6 @@ import {
   RegisterOptions,
 } from './types'
 import appendAt from './utils/append'
-import cloneObject from './utils/cloneObject'
 import convertToArrayPayload from './utils/convertToArrayPayload'
 import fillEmptyArray from './utils/fillEmptyArray'
 import get from './utils/get'
@@ -150,7 +149,7 @@ export function createFieldArray<
       | Partial<FieldArray<TFieldValues, TFieldArrayName>>[],
     options?: FieldArrayMethodProps,
   ) => {
-    const appendValue = convertToArrayPayload(cloneObject(value))
+    const appendValue = convertToArrayPayload(mergeProps(value))
     const updatedFieldArrayValues = appendAt(
       control._getFieldArray(name),
       appendValue,
@@ -174,7 +173,7 @@ export function createFieldArray<
       | Partial<FieldArray<TFieldValues, TFieldArrayName>>[],
     options?: FieldArrayMethodProps,
   ) => {
-    const prependValue = convertToArrayPayload(cloneObject(value))
+    const prependValue = convertToArrayPayload(mergeProps(value))
     const updatedFieldArrayValues = prependAt(
       control._getFieldArray(name),
       prependValue,
@@ -207,7 +206,7 @@ export function createFieldArray<
       | Partial<FieldArray<TFieldValues, TFieldArrayName>>[],
     options?: FieldArrayMethodProps,
   ) => {
-    const insertValue = convertToArrayPayload(cloneObject(value))
+    const insertValue = convertToArrayPayload(mergeProps(value))
     const updatedFieldArrayValues = insertAt(
       control._getFieldArray(name),
       index,
@@ -263,7 +262,7 @@ export function createFieldArray<
     index: number,
     value: FieldArray<TFieldValues, TFieldArrayName>,
   ) => {
-    const updateValue = cloneObject(value)
+    const updateValue = mergeProps(value)
     const updatedFieldArrayValues = updateAt(
       control._getFieldArray<
         FieldArrayWithId<TFieldValues, TFieldArrayName, TKeyName>
@@ -294,7 +293,7 @@ export function createFieldArray<
       | Partial<FieldArray<TFieldValues, TFieldArrayName>>
       | Partial<FieldArray<TFieldValues, TFieldArrayName>>[],
   ) => {
-    const updatedFieldArrayValues = convertToArrayPayload(cloneObject(value))
+    const updatedFieldArrayValues = convertToArrayPayload(mergeProps(value))
     ids = updatedFieldArrayValues.map(generateId)
     updateValues([...updatedFieldArrayValues])
     setFields([...updatedFieldArrayValues])

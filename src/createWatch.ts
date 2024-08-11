@@ -1,4 +1,5 @@
 import Solid from 'solid-js'
+import { mergeProps } from 'solid-js'
 
 import { createFormContext } from './createFormContext'
 import { createSubscribe } from './createSubscribe'
@@ -14,7 +15,6 @@ import {
   FieldValues,
   InternalFieldName,
 } from './types'
-import cloneObject from './utils/cloneObject'
 
 /**
  * Subscribe to the entire form values change and re-render at the hook level.
@@ -161,14 +161,10 @@ export function createWatch<TFieldValues extends FieldValues>(
     subject: control._subjects.values,
     next: (formState: { name?: InternalFieldName; values?: FieldValues }) => {
       if (
-        shouldSubscribeByName(
-          _name as InternalFieldName,
-          formState.name,
-          exact,
-        )
+        shouldSubscribeByName(_name as InternalFieldName, formState.name, exact)
       ) {
         updateValue(
-          cloneObject(
+          mergeProps(
             generateWatchOutput(
               _name as InternalFieldName | InternalFieldName[],
               control._names,

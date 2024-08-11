@@ -1,4 +1,5 @@
-import { createEffect, on } from 'solid-js'
+import { createEffect, mergeProps, on } from 'solid-js'
+
 import { EVENTS } from './constants'
 import { createFormContext } from './createFormContext'
 import { createFormState } from './createFormState'
@@ -15,7 +16,6 @@ import {
   FieldValues,
   InternalFieldName,
 } from './types'
-import cloneObject from './utils/cloneObject'
 import get from './utils/get'
 import isBoolean from './utils/isBoolean'
 import isUndefined from './utils/isUndefined'
@@ -91,7 +91,7 @@ export function createController<
     updateMounted(name, true)
 
     if (_shouldUnregisterField) {
-      const value = cloneObject(get(control._options.defaultValues, name))
+      const value = mergeProps(get(control._options.defaultValues, name))
       set(control._defaultValues, name, value)
       if (isUndefined(get(control._formValues, name))) {
         set(control._formValues, name, value)
