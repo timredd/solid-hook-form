@@ -102,7 +102,7 @@ type AsyncDefaultValues<TFieldValues> = (
   payload?: unknown,
 ) => Promise<TFieldValues>
 
-export type UseFormProps<
+export type CreateFormProps<
   TFieldValues extends FieldValues = FieldValues,
   TContext = any,
 > = Partial<{
@@ -112,7 +112,7 @@ export type UseFormProps<
   defaultValues: DefaultValues<TFieldValues> | AsyncDefaultValues<TFieldValues>
   values: TFieldValues
   errors: FieldErrors<TFieldValues>
-  resetOptions: Parameters<UseFormReset<TFieldValues>>[1]
+  resetOptions: Parameters<CreateFormReset<TFieldValues>>[1]
   resolver: Resolver<TFieldValues, TContext>
   context: TContext
   shouldFocusError: boolean
@@ -176,7 +176,7 @@ export type SetFieldValue<TFieldValues extends FieldValues> =
 
 export type RefCallBack = (instance: any) => void
 
-export type UseFormRegisterReturn<
+export type CreateFormRegisterReturn<
   TFieldName extends InternalFieldName = InternalFieldName,
 > = {
   onChange: ChangeHandler
@@ -225,12 +225,12 @@ export type UseFormRegisterReturn<
  * <input onChange={onChange} onBlur={onBlur} name={name} />
  * ```
  */
-export type UseFormRegister<TFieldValues extends FieldValues> = <
+export type CreateFormRegister<TFieldValues extends FieldValues> = <
   TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(
   name: TFieldName,
   options?: RegisterOptions<TFieldValues, TFieldName>,
-) => UseFormRegisterReturn<TFieldName>
+) => CreateFormRegisterReturn<TFieldName>
 
 export type SetFocusOptions = Partial<{
   shouldSelect: boolean
@@ -254,14 +254,14 @@ export type SetFocusOptions = Partial<{
  * <button onClick={() => setFocus("name", { shouldSelect: true })}>Focus</button>
  * ```
  */
-export type UseFormSetFocus<TFieldValues extends FieldValues> = <
+export type CreateFormSetFocus<TFieldValues extends FieldValues> = <
   TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(
   name: TFieldName,
   options?: SetFocusOptions,
 ) => void
 
-export type UseFormGetValues<TFieldValues extends FieldValues> = {
+export type CreateFormGetValues<TFieldValues extends FieldValues> = {
   /**
    * Get the entire form values when no argument is supplied to this function.
    *
@@ -344,13 +344,13 @@ export type UseFormGetValues<TFieldValues extends FieldValues> = {
  * // Get field state when form state is not subscribed yet
  * getFieldState('name', formState)
  *
- * // It's ok to combine with useFormState
- * const formState = useFormState();
+ * // It's ok to combine with createFormState
+ * const formState = createFormState();
  * getFieldState('name')
  * getFieldState('name', formState)
  * ```
  */
-export type UseFormGetFieldState<TFieldValues extends FieldValues> = <
+export type CreateFormGetFieldState<TFieldValues extends FieldValues> = <
   TFieldName extends FieldPath<TFieldValues>,
 >(
   name: TFieldName,
@@ -363,9 +363,9 @@ export type UseFormGetFieldState<TFieldValues extends FieldValues> = <
   error?: FieldError
 }
 
-export type UseFormWatch<TFieldValues extends FieldValues> = {
+export type CreateFormWatch<TFieldValues extends FieldValues> = {
   /**
-   * Watch and subscribe to the entire form update/change based on onChange and re-render at the useForm.
+   * Watch and subscribe to the entire form update/change based on onChange and re-render at the createForm.
    *
    * @remarks
    * [API](https://react-hook-form.com/docs/useform/watch) • [Demo](https://codesandbox.io/s/react-hook-form-watch-v7-ts-8et1d) • [Video](https://www.youtube.com/watch?v=3qLd69WMqKk)
@@ -469,7 +469,7 @@ export type UseFormWatch<TFieldValues extends FieldValues> = {
  *  </button>
  * ```
  */
-export type UseFormTrigger<TFieldValues extends FieldValues> = (
+export type CreateFormTrigger<TFieldValues extends FieldValues> = (
   name?:
     | FieldPath<TFieldValues>
     | FieldPath<TFieldValues>[]
@@ -493,7 +493,7 @@ export type UseFormTrigger<TFieldValues extends FieldValues> = (
  * clearErrors("name2"); // clear a single field error
  * ```
  */
-export type UseFormClearErrors<TFieldValues extends FieldValues> = (
+export type CreateFormClearErrors<TFieldValues extends FieldValues> = (
   name?:
     | FieldPath<TFieldValues>
     | FieldPath<TFieldValues>[]
@@ -531,7 +531,7 @@ export type UseFormClearErrors<TFieldValues extends FieldValues> = (
  * setValue('select', { label: 'test', value: 'Test' });
  * ```
  */
-export type UseFormSetValue<TFieldValues extends FieldValues> = <
+export type CreateFormSetValue<TFieldValues extends FieldValues> = <
   TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(
   name: TFieldName,
@@ -560,7 +560,7 @@ export type UseFormSetValue<TFieldValues extends FieldValues> = <
  * <button onClick={() => setError("name", { type: "max" }, { shouldFocus: true })} />
  * ```
  */
-export type UseFormSetError<TFieldValues extends FieldValues> = (
+export type CreateFormSetError<TFieldValues extends FieldValues> = (
   name: FieldPath<TFieldValues> | `root.${string}` | 'root',
   error: ErrorOption,
   options?: {
@@ -586,7 +586,7 @@ export type UseFormSetError<TFieldValues extends FieldValues> = (
  * <button onClick={() => unregister("name", { keepErrors: true })} />
  * ```
  */
-export type UseFormUnregister<TFieldValues extends FieldValues> = (
+export type CreateFormUnregister<TFieldValues extends FieldValues> = (
   name?:
     | FieldPath<TFieldValues>
     | FieldPath<TFieldValues>[]
@@ -621,7 +621,7 @@ export type UseFormUnregister<TFieldValues extends FieldValues> = (
  * ```
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export type UseFormHandleSubmit<
+export type CreateFormHandleSubmit<
   TFieldValues extends FieldValues,
   TTransformedValues extends FieldValues | undefined = undefined,
 > = (
@@ -648,7 +648,7 @@ export type UseFormHandleSubmit<
  * <button type="button" onClick={() => resetField("firstName"))}>Reset</button>
  * ```
  */
-export type UseFormResetField<TFieldValues extends FieldValues> = <
+export type CreateFormResetField<TFieldValues extends FieldValues> = <
   TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(
   name: TFieldName,
@@ -696,7 +696,7 @@ type ResetAction<TFieldValues> = (formValues: TFieldValues) => TFieldValues
  *});
  * ```
  */
-export type UseFormReset<TFieldValues extends FieldValues> = (
+export type CreateFormReset<TFieldValues extends FieldValues> = (
   values?:
     | DefaultValues<TFieldValues>
     | TFieldValues
@@ -775,8 +775,8 @@ export type Control<
     action: boolean
     watch: boolean
   }
-  _reset: UseFormReset<TFieldValues>
-  _options: UseFormProps<TFieldValues, TContext>
+  _reset: CreateFormReset<TFieldValues>
+  _options: CreateFormProps<TFieldValues, TContext>
   _getDirty: GetIsDirty
   _resetDefaultValues: Noop
   _formState: FormState<TFieldValues>
@@ -811,12 +811,12 @@ export type Control<
   _executeSchema: (
     names: InternalFieldName[],
   ) => Promise<{ errors: FieldErrors }>
-  register: UseFormRegister<TFieldValues>
-  handleSubmit: UseFormHandleSubmit<TFieldValues>
+  register: CreateFormRegister<TFieldValues>
+  handleSubmit: CreateFormHandleSubmit<TFieldValues>
   _disableForm: (disabled?: boolean) => void
-  unregister: UseFormUnregister<TFieldValues>
-  getFieldState: UseFormGetFieldState<TFieldValues>
-  setError: UseFormSetError<TFieldValues>
+  unregister: CreateFormUnregister<TFieldValues>
+  getFieldState: CreateFormGetFieldState<TFieldValues>
+  setError: CreateFormSetError<TFieldValues>
 }
 
 export type WatchObserver<TFieldValues extends FieldValues> = (
@@ -828,29 +828,29 @@ export type WatchObserver<TFieldValues extends FieldValues> = (
   },
 ) => void
 
-export type UseFormReturn<
+export type CreateFormReturn<
   TFieldValues extends FieldValues = FieldValues,
   TContext = any,
   TTransformedValues extends FieldValues | undefined = undefined,
 > = {
-  watch: UseFormWatch<TFieldValues>
-  getValues: UseFormGetValues<TFieldValues>
-  getFieldState: UseFormGetFieldState<TFieldValues>
-  setError: UseFormSetError<TFieldValues>
-  clearErrors: UseFormClearErrors<TFieldValues>
-  setValue: UseFormSetValue<TFieldValues>
-  trigger: UseFormTrigger<TFieldValues>
+  watch: CreateFormWatch<TFieldValues>
+  getValues: CreateFormGetValues<TFieldValues>
+  getFieldState: CreateFormGetFieldState<TFieldValues>
+  setError: CreateFormSetError<TFieldValues>
+  clearErrors: CreateFormClearErrors<TFieldValues>
+  setValue: CreateFormSetValue<TFieldValues>
+  trigger: CreateFormTrigger<TFieldValues>
   formState: FormState<TFieldValues>
-  resetField: UseFormResetField<TFieldValues>
-  reset: UseFormReset<TFieldValues>
-  handleSubmit: UseFormHandleSubmit<TFieldValues, TTransformedValues>
-  unregister: UseFormUnregister<TFieldValues>
+  resetField: CreateFormResetField<TFieldValues>
+  reset: CreateFormReset<TFieldValues>
+  handleSubmit: CreateFormHandleSubmit<TFieldValues, TTransformedValues>
+  unregister: CreateFormUnregister<TFieldValues>
   control: Control<TFieldValues, TContext>
-  register: UseFormRegister<TFieldValues>
-  setFocus: UseFormSetFocus<TFieldValues>
+  register: CreateFormRegister<TFieldValues>
+  setFocus: CreateFormSetFocus<TFieldValues>
 }
 
-export type UseFormStateProps<TFieldValues extends FieldValues> = Partial<{
+export type CreateFormStateProps<TFieldValues extends FieldValues> = Partial<{
   control?: Control<TFieldValues>
   disabled?: boolean
   name?:
@@ -860,7 +860,7 @@ export type UseFormStateProps<TFieldValues extends FieldValues> = Partial<{
   exact?: boolean
 }>
 
-export type UseFormStateReturn<TFieldValues extends FieldValues> =
+export type CreateFormStateReturn<TFieldValues extends FieldValues> =
   FormState<TFieldValues>
 
 export type UseWatchProps<TFieldValues extends FieldValues = FieldValues> = {
@@ -880,7 +880,7 @@ export type FormProviderProps<
   TTransformedValues extends FieldValues | undefined = undefined,
 > = {
   children: React.ReactNode | React.ReactNode[]
-} & UseFormReturn<TFieldValues, TContext, TTransformedValues>
+} & CreateFormReturn<TFieldValues, TContext, TTransformedValues>
 
 export type FormProps<
   TFieldValues extends FieldValues,

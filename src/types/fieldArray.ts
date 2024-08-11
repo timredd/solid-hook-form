@@ -27,7 +27,7 @@ export type UseFieldArrayProps<
 }
 
 /**
- * `useFieldArray` returned `fields` with unique id
+ * `createFieldArray` returned `fields` with unique id
  */
 export type FieldArrayWithId<
   TFieldValues extends FieldValues = FieldValues,
@@ -48,7 +48,7 @@ export type FieldArray<
   : never
 
 /**
- * `useFieldArray` focus option, ability to toggle focus on and off with `shouldFocus` and setting focus by either field index or name.
+ * `createFieldArray` focus option, ability to toggle focus on and off with `shouldFocus` and setting focus by either field index or name.
  */
 export type FieldArrayMethodProps = {
   shouldFocus?: boolean

@@ -9,11 +9,11 @@ import {
   FieldPathValue,
   FieldValues,
   InternalFieldName,
-  UseControllerProps,
-  UseControllerReturn,
+  CreateControllerProps,
+  CreateControllerReturn,
 } from './types'
-import { useFormContext } from './useFormContext'
-import { useFormState } from './useFormState'
+import { createFormContext } from './createFormContext'
+import { createFormState } from './createFormState'
 import { useWatch } from './useWatch'
 import cloneObject from './utils/cloneObject'
 import get from './utils/get'
@@ -29,7 +29,7 @@ import set from './utils/set'
  *
  * @param props - the path name to the form field value, and validation rules.
  *
- * @returns field properties, field and form state. {@link UseControllerReturn}
+ * @returns field properties, field and form state. {@link CreateControllerReturn}
  *
  * @example
  * ```tsx
@@ -49,9 +49,9 @@ export function createController<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(
-  props: UseControllerProps<TFieldValues, TName>,
-): UseControllerReturn<TFieldValues, TName> {
-  const methods = useFormContext<TFieldValues>()
+  props: CreateControllerProps<TFieldValues, TName>,
+): CreateControllerReturn<TFieldValues, TName> {
+  const methods = createFormContext<TFieldValues>()
   const { name, disabled, control = methods.control, shouldUnregister } = props
   const isArrayField = isNameInFieldArray(control._names.array, name)
   const value = useWatch({
@@ -64,7 +64,7 @@ export function createController<
     ),
     exact: true,
   }) as FieldPathValue<TFieldValues, TName>
-  const formState = useFormState({
+  const formState = createFormState({
     control,
     name,
     exact: true,

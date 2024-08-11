@@ -1,4 +1,4 @@
-import { JSX } from 'solid-js/jsx-runtime'
+import { JSX } from 'solid-js'
 import {
   Control,
   FieldError,
@@ -7,7 +7,7 @@ import {
   FieldValues,
   Noop,
   RefCallBack,
-  UseFormStateReturn,
+  CreateFormStateReturn,
 } from './'
 import { RegisterOptions } from './validator'
 
@@ -31,7 +31,7 @@ export type ControllerRenderProps<
   ref: RefCallBack
 }
 
-export type UseControllerProps<
+export type CreateControllerProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = {
@@ -46,12 +46,12 @@ export type UseControllerProps<
   disabled?: boolean
 }
 
-export type UseControllerReturn<
+export type CreateControllerReturn<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = {
   field: ControllerRenderProps<TFieldValues, TName>
-  formState: UseFormStateReturn<TFieldValues>
+  formState: CreateFormStateReturn<TFieldValues>
   fieldState: ControllerFieldState
 }
 
@@ -62,7 +62,7 @@ export type UseControllerReturn<
  *
  * @example
  * ```tsx
- * const { field, fieldState, formState } = useController();
+ * const { field, fieldState, formState } = createController();
  *
  * <Controller
  *   render={({ field, formState, fieldState }) => ({
@@ -87,6 +87,6 @@ export type ControllerProps<
   }: {
     field: ControllerRenderProps<TFieldValues, TName>
     fieldState: ControllerFieldState
-    formState: UseFormStateReturn<TFieldValues>
+    formState: CreateFormStateReturn<TFieldValues>
   }) => JSX.Element
-} & UseControllerProps<TFieldValues, TName>
+} & CreateControllerProps<TFieldValues, TName>
