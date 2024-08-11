@@ -65,12 +65,12 @@ export type CriteriaMode = 'firstError' | 'all'
 
 export type SubmitHandler<TFieldValues extends FieldValues> = (
   data: TFieldValues,
-  event?: React.BaseSyntheticEvent,
+  event?: Solid.BaseSyntheticEvent,
 ) => unknown | Promise<unknown>
 
 export type FormSubmitHandler<TFieldValues extends FieldValues> = (payload: {
   data: TFieldValues
-  event?: React.BaseSyntheticEvent
+  event?: Solid.BaseSyntheticEvent
   formData: FormData
   formDataJson: string
   method?: 'post' | 'put' | 'delete'
@@ -78,7 +78,7 @@ export type FormSubmitHandler<TFieldValues extends FieldValues> = (payload: {
 
 export type SubmitErrorHandler<TFieldValues extends FieldValues> = (
   errors: FieldErrors<TFieldValues>,
-  event?: React.BaseSyntheticEvent,
+  event?: Solid.BaseSyntheticEvent,
 ) => unknown | Promise<unknown>
 
 export type SetValueConfig = Partial<{
@@ -193,7 +193,7 @@ export type CreateFormRegisterReturn<
 }
 
 /**
- * Register field into hook form with or without the actual DOM ref. You can invoke register anywhere in the component including at `useEffect`.
+ * Register field into hook form with or without the actual DOM ref. You can invoke register anywhere in the component including at `createEffect`.
  *
  * @remarks
  * [API](https://react-hook-form.com/docs/useform/register) • [Demo](https://codesandbox.io/s/react-hook-form-register-ts-ip2j3) • [Video](https://www.youtube.com/watch?v=JFIpCoajYkA)
@@ -214,8 +214,8 @@ export type CreateFormRegisterReturn<
  * <input type="number" {...register("name2", { valueAsNumber: true })} />
  * <input {...register("name3", { deps: ["name2"] })} />
  *
- * // Register custom field at useEffect
- * useEffect(() => {
+ * // Register custom field at createEffect
+ * createEffect(() => {
  *   register("name4");
  *   register("name5", { value: '"hiddenValue" });
  * }, [register])
@@ -247,7 +247,7 @@ export type SetFocusOptions = Partial<{
  *
  * @example
  * ```tsx
- * useEffect(() => {
+ * createEffect(() => {
  *   setFocus("name");
  * }, [setFocus])
  * // shouldSelect allows to select input's content on focus
@@ -431,7 +431,7 @@ export type CreateFormWatch<TFieldValues extends FieldValues> = {
    *
    * @example
    * ```tsx
-   * useEffect(() => {
+   * createEffect(() => {
    *   const { unsubscribe } = watch((value) => {
    *     console.log(value);
    *   });
@@ -458,7 +458,7 @@ export type CreateFormWatch<TFieldValues extends FieldValues> = {
  *
  * @example
  * ```tsx
- * useEffect(() => {
+ * createEffect(() => {
  *   trigger();
  * }, [trigger])
  *
@@ -631,7 +631,7 @@ export type CreateFormHandleSubmit<
       ? SubmitHandler<TTransformedValues>
       : never,
   onInvalid?: SubmitErrorHandler<TFieldValues>,
-) => (e?: React.BaseSyntheticEvent) => Promise<void>
+) => (e?: Solid.BaseSyntheticEvent) => Promise<void>
 
 /**
  * Reset a field state and reference.
@@ -673,7 +673,7 @@ type ResetAction<TFieldValues> = (formValues: TFieldValues) => TFieldValues
  *
  * @example
  * ```tsx
- * useEffect(() => {
+ * createEffect(() => {
  *   // reset the entire form after component mount or form defaultValues is ready
  *   reset({
  *     fieldA: "test"
@@ -879,13 +879,13 @@ export type FormProviderProps<
   TContext = any,
   TTransformedValues extends FieldValues | undefined = undefined,
 > = {
-  children: React.ReactNode | React.ReactNode[]
+  children: Solid.SolidNode | Solid.SolidNode[]
 } & CreateFormReturn<TFieldValues, TContext, TTransformedValues>
 
 export type FormProps<
   TFieldValues extends FieldValues,
   TTransformedValues extends FieldValues | undefined = undefined,
-> = Omit<React.FormHTMLAttributes<HTMLFormElement>, 'onError' | 'onSubmit'> &
+> = Omit<Solid.FormHTMLAttributes<HTMLFormElement>, 'onError' | 'onSubmit'> &
   Partial<{
     control: Control<TFieldValues>
     headers: Record<string, string>
@@ -907,10 +907,10 @@ export type FormProps<
       ? FormSubmitHandler<TTransformedValues>
       : FormSubmitHandler<TFieldValues>
     method: 'post' | 'put' | 'delete'
-    children: React.ReactNode | React.ReactNode[]
+    children: Solid.SolidNode | Solid.SolidNode[]
     render: (props: {
-      submit: (e?: React.FormEvent) => void
-    }) => React.ReactNode | React.ReactNode[]
+      submit: (e?: Solid.FormEvent) => void
+    }) => Solid.SolidNode | Solid.SolidNode[]
     encType:
       | 'application/x-www-form-urlencoded'
       | 'multipart/form-data'

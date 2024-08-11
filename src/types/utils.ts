@@ -1,8 +1,8 @@
 import { NestedValue } from './form'
 
 /*
-Projects that React Hook Form installed don't include the DOM library need these interfaces to compile.
-React Native applications is no DOM available. The JavaScript runtime is ES6/ES2015 only.
+Projects that Solid Hook Form installed don't include the DOM library need these interfaces to compile.
+Solid Native applications is no DOM available. The JavaScript runtime is ES6/ES2015 only.
 These definitions allow such projects to compile with only --lib ES6.
 
 Warning: all of these interfaces are empty.
