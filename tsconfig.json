@@ -19,6 +19,8 @@
     "declaration": true,
     "declarationMap": true,
     "lib": [
+      "dom",
+      "dom.iterable",
       "esnext"
     ],
     "strict": true,
