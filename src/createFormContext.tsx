@@ -1,6 +1,6 @@
-import Solid from 'solid-js'
+import Solid, { splitProps } from 'solid-js'
 
-import { FieldValues, FormProviderProps, CreateFormReturn } from './types'
+import { CreateFormReturn, FieldValues, FormProviderProps } from './types'
 
 const HookFormContext = Solid.createContext<CreateFormReturn | null>(null)
 
@@ -82,10 +82,11 @@ export const FormProvider = <
 >(
   props: FormProviderProps<TFieldValues, TContext, TTransformedValues>,
 ) => {
-  const { children, ...data } = props
+  const [, data] = splitProps(props, ['children'])
+
   return (
     <HookFormContext.Provider value={data as unknown as CreateFormReturn}>
-      {children}
+      {props.children}
     </HookFormContext.Provider>
   )
 }
