@@ -1,3 +1,5 @@
+import type Solid from 'solid-js'
+
 import { VALIDATION_MODE } from '../constants'
 import { Subject, Subscription } from '../utils/createSubject'
 
@@ -65,12 +67,12 @@ export type CriteriaMode = 'firstError' | 'all'
 
 export type SubmitHandler<TFieldValues extends FieldValues> = (
   data: TFieldValues,
-  event?: Solid.BaseSyntheticEvent,
+  event?: SubmitEvent, // or Event
 ) => unknown | Promise<unknown>
 
 export type FormSubmitHandler<TFieldValues extends FieldValues> = (payload: {
   data: TFieldValues
-  event?: Solid.BaseSyntheticEvent
+  event?: SubmitEvent // or Event
   formData: FormData
   formDataJson: string
   method?: 'post' | 'put' | 'delete'
@@ -78,7 +80,7 @@ export type FormSubmitHandler<TFieldValues extends FieldValues> = (payload: {
 
 export type SubmitErrorHandler<TFieldValues extends FieldValues> = (
   errors: FieldErrors<TFieldValues>,
-  event?: Solid.BaseSyntheticEvent,
+  event?: SubmitEvent,
 ) => unknown | Promise<unknown>
 
 export type SetValueConfig = Partial<{
@@ -631,7 +633,7 @@ export type CreateFormHandleSubmit<
       ? SubmitHandler<TTransformedValues>
       : never,
   onInvalid?: SubmitErrorHandler<TFieldValues>,
-) => (e?: Solid.BaseSyntheticEvent) => Promise<void>
+) => (e?: SubmitEvent) => Promise<void>
 
 /**
  * Reset a field state and reference.
@@ -879,13 +881,16 @@ export type FormProviderProps<
   TContext = any,
   TTransformedValues extends FieldValues | undefined = undefined,
 > = {
-  children: Solid.SolidNode | Solid.SolidNode[]
+  children: Solid.JSX.Element
 } & CreateFormReturn<TFieldValues, TContext, TTransformedValues>
 
 export type FormProps<
   TFieldValues extends FieldValues,
   TTransformedValues extends FieldValues | undefined = undefined,
-> = Omit<Solid.FormHTMLAttributes<HTMLFormElement>, 'onError' | 'onSubmit'> &
+> = Omit<
+  Solid.JSX.FormHTMLAttributes<HTMLFormElement>,
+  'onError' | 'onSubmit'
+> &
   Partial<{
     control: Control<TFieldValues>
     headers: Record<string, string>
@@ -907,13 +912,36 @@ export type FormProps<
       ? FormSubmitHandler<TTransformedValues>
       : FormSubmitHandler<TFieldValues>
     method: 'post' | 'put' | 'delete'
-    children: Solid.SolidNode | Solid.SolidNode[]
+    children: Solid.JSX.Element
     render: (props: {
-      submit: (e?: Solid.FormEvent) => void
-    }) => Solid.SolidNode | Solid.SolidNode[]
+      submit: (e?: FormEvent) => void
+    }) => Solid.JSX.Element
     encType:
       | 'application/x-www-form-urlencoded'
       | 'multipart/form-data'
       | 'text/plain'
       | 'application/json'
   }>
+
+/// Porting React's BaseSyntheticEvent, SyntheticEvent and FormEvent
+/// Will hopefully be removed in the future
+interface BaseSyntheticEvent<E = object, C = any, T = any> {
+  nativeEvent: E
+  currentTarget: C
+  target: T
+  bubbles: boolean
+  cancelable: boolean
+  defaultPrevented: boolean
+  eventPhase: number
+  isTrusted: boolean
+  preventDefault(): void
+  isDefaultPrevented(): boolean
+  stopPropagation(): void
+  isPropagationStopped(): boolean
+  persist(): void
+  timeStamp: number
+  type: string
+}
+interface SyntheticEvent<T = Element, E = Event>
+  extends BaseSyntheticEvent<E, EventTarget & T, EventTarget> {}
+interface FormEvent<T = Solid.JSX.Element> extends SyntheticEvent<T> {}
