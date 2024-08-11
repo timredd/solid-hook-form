@@ -34,7 +34,7 @@ import set from './utils/set'
  * @example
  * ```tsx
  * function Input(props) {
- *   const { field, fieldState, formState } = useController(props);
+ *   const { field, fieldState, formState } = createController(props);
  *   return (
  *     <div>
  *       <input {...field} placeholder={props.name} />
@@ -134,44 +134,35 @@ export function createController<
       ...(isBoolean(disabled) || formState.disabled
         ? { disabled: formState.disabled || disabled }
         : {}),
-      onChange: React.useCallback(
-        (event) =>
-          _registerProps.current.onChange({
-            target: {
-              value: getEventValue(event),
-              name: name as InternalFieldName,
-            },
-            type: EVENTS.CHANGE,
-          }),
-        [name],
-      ),
-      onBlur: React.useCallback(
-        () =>
-          _registerProps.current.onBlur({
-            target: {
-              value: get(control._formValues, name),
-              name: name as InternalFieldName,
-            },
-            type: EVENTS.BLUR,
-          }),
-        [name, control],
-      ),
-      ref: React.useCallback(
-        (elm) => {
-          const field = get(control._fields, name)
+      onChange: (event) =>
+        _registerProps.current.onChange({
+          target: {
+            value: getEventValue(event),
+            name: name as InternalFieldName,
+          },
+          type: EVENTS.CHANGE,
+        }),
+      onBlur: () =>
+        _registerProps.current.onBlur({
+          target: {
+            value: get(control._formValues, name),
+            name: name as InternalFieldName,
+          },
+          type: EVENTS.BLUR,
+        }),
+      ref: (elm) => {
+        const field = get(control._fields, name)
 
-          if (field && elm) {
-            field._f.ref = {
-              focus: () => elm.focus(),
-              select: () => elm.select(),
-              setCustomValidity: (message: string) =>
-                elm.setCustomValidity(message),
-              reportValidity: () => elm.reportValidity(),
-            }
+        if (field && elm) {
+          field._f.ref = {
+            focus: () => elm.focus(),
+            select: () => elm.select(),
+            setCustomValidity: (message: string) =>
+              elm.setCustomValidity(message),
+            reportValidity: () => elm.reportValidity(),
           }
-        },
-        [control._fields, name],
-      ),
+        }
+      },
     },
     formState,
     fieldState: Object.defineProperties(
