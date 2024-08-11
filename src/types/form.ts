@@ -925,7 +925,7 @@ export type FormProps<
 
 /// Porting React's BaseSyntheticEvent, SyntheticEvent and FormEvent
 /// Will hopefully be removed in the future
-interface BaseSyntheticEvent<E = object, C = any, T = any> {
+export interface BaseSyntheticEvent<E = object, C = any, T = any> {
   nativeEvent: E
   currentTarget: C
   target: T
@@ -942,6 +942,6 @@ interface BaseSyntheticEvent<E = object, C = any, T = any> {
   timeStamp: number
   type: string
 }
-interface SyntheticEvent<T = Element, E = Event>
+export interface SyntheticEvent<T = Element, E = Event>
   extends BaseSyntheticEvent<E, EventTarget & T, EventTarget> {}
-interface FormEvent<T = Solid.JSX.Element> extends SyntheticEvent<T> {}
+export interface FormEvent<T = Solid.JSX.Element> extends SyntheticEvent<T> {}
