@@ -117,7 +117,7 @@ export type CreateFormProps<
   context: TContext
   shouldFocusError: boolean
   shouldUnregister: boolean
-  shouldUseNativeValidation: boolean
+  shouldCreateNativeValidation: boolean
   progressive: boolean
   criteriaMode: CriteriaMode
   delayError: number
@@ -863,7 +863,7 @@ export type CreateFormStateProps<TFieldValues extends FieldValues> = Partial<{
 export type CreateFormStateReturn<TFieldValues extends FieldValues> =
   FormState<TFieldValues>
 
-export type UseWatchProps<TFieldValues extends FieldValues = FieldValues> = {
+export type CreateWatchProps<TFieldValues extends FieldValues = FieldValues> = {
   defaultValue?: unknown
   disabled?: boolean
   name?:

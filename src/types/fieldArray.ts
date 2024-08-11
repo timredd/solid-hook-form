@@ -3,7 +3,7 @@ import { Control } from './form'
 import { FieldArrayPath, FieldArrayPathValue } from './path'
 import { RegisterOptions, Validate } from './validator'
 
-export type UseFieldArrayProps<
+export type CreateFieldArrayProps<
   TFieldValues extends FieldValues = FieldValues,
   TFieldArrayName extends
     FieldArrayPath<TFieldValues> = FieldArrayPath<TFieldValues>,
@@ -70,7 +70,7 @@ export type FieldArrayMethodProps = {
  * <button type="button" onClick={() => swap(0, 1)}>swap</button>
  * ```
  */
-export type UseFieldArraySwap = (indexA: number, indexB: number) => void
+export type CreateFieldArraySwap = (indexA: number, indexB: number) => void
 
 /**
  * Move field array by supplying from and to index
@@ -86,7 +86,7 @@ export type UseFieldArraySwap = (indexA: number, indexB: number) => void
  * <button type="button" onClick={() => move(0, 1)}>swap</button>
  * ```
  */
-export type UseFieldArrayMove = (indexA: number, indexB: number) => void
+export type CreateFieldArrayMove = (indexA: number, indexB: number) => void
 
 /**
  * Prepend field/fields to the start of the fields and optionally focus. The input value will be registered during this action.
@@ -109,7 +109,7 @@ export type UseFieldArrayMove = (indexA: number, indexB: number) => void
  * </button>
  * ```
  */
-export type UseFieldArrayPrepend<
+export type CreateFieldArrayPrepend<
   TFieldValues extends FieldValues,
   TFieldArrayName extends
     FieldArrayPath<TFieldValues> = FieldArrayPath<TFieldValues>,
@@ -141,7 +141,7 @@ export type UseFieldArrayPrepend<
  * </button>
  * ```
  */
-export type UseFieldArrayAppend<
+export type CreateFieldArrayAppend<
   TFieldValues extends FieldValues,
   TFieldArrayName extends
     FieldArrayPath<TFieldValues> = FieldArrayPath<TFieldValues>,
@@ -171,7 +171,7 @@ export type UseFieldArrayAppend<
  * </button>
  * ```
  */
-export type UseFieldArrayRemove = (index?: number | number[]) => void
+export type CreateFieldArrayRemove = (index?: number | number[]) => void
 
 /**
  * Insert field/fields at particular position and focus.
@@ -195,7 +195,7 @@ export type UseFieldArrayRemove = (index?: number | number[]) => void
  * </button>
  * ```
  */
-export type UseFieldArrayInsert<
+export type CreateFieldArrayInsert<
   TFieldValues extends FieldValues,
   TFieldArrayName extends
     FieldArrayPath<TFieldValues> = FieldArrayPath<TFieldValues>,
@@ -227,7 +227,7 @@ export type UseFieldArrayInsert<
  * </button>
  * ```
  */
-export type UseFieldArrayUpdate<
+export type CreateFieldArrayUpdate<
   TFieldValues extends FieldValues,
   TFieldArrayName extends
     FieldArrayPath<TFieldValues> = FieldArrayPath<TFieldValues>,
@@ -251,7 +251,7 @@ export type UseFieldArrayUpdate<
  * </button>
  * ```
  */
-export type UseFieldArrayReplace<
+export type CreateFieldArrayReplace<
   TFieldValues extends FieldValues,
   TFieldArrayName extends
     FieldArrayPath<TFieldValues> = FieldArrayPath<TFieldValues>,
@@ -261,19 +261,19 @@ export type UseFieldArrayReplace<
     | FieldArray<TFieldValues, TFieldArrayName>[],
 ) => void
 
-export type UseFieldArrayReturn<
+export type CreateFieldArrayReturn<
   TFieldValues extends FieldValues = FieldValues,
   TFieldArrayName extends
     FieldArrayPath<TFieldValues> = FieldArrayPath<TFieldValues>,
   TKeyName extends string = 'id',
 > = {
-  swap: UseFieldArraySwap
-  move: UseFieldArrayMove
-  prepend: UseFieldArrayPrepend<TFieldValues, TFieldArrayName>
-  append: UseFieldArrayAppend<TFieldValues, TFieldArrayName>
-  remove: UseFieldArrayRemove
-  insert: UseFieldArrayInsert<TFieldValues, TFieldArrayName>
-  update: UseFieldArrayUpdate<TFieldValues, TFieldArrayName>
-  replace: UseFieldArrayReplace<TFieldValues, TFieldArrayName>
+  swap: CreateFieldArraySwap
+  move: CreateFieldArrayMove
+  prepend: CreateFieldArrayPrepend<TFieldValues, TFieldArrayName>
+  append: CreateFieldArrayAppend<TFieldValues, TFieldArrayName>
+  remove: CreateFieldArrayRemove
+  insert: CreateFieldArrayInsert<TFieldValues, TFieldArrayName>
+  update: CreateFieldArrayUpdate<TFieldValues, TFieldArrayName>
+  replace: CreateFieldArrayReplace<TFieldValues, TFieldArrayName>
   fields: FieldArrayWithId<TFieldValues, TFieldArrayName, TKeyName>[]
 }
