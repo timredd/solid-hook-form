@@ -7,8 +7,40 @@
     "esModuleInterop": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["vite/client"],
+    "types": [
+      "vite/client"
+    ],
     "noEmit": true,
     "isolatedModules": true,
+    // From react-hook-form
+    "sourceMap": true,
+    "outDir": "./dist",
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    "lib": [
+      "esnext"
+    ],
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
+    // "module": "es2015",
+    // "target": "es2018",
   },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "app",
+    "examples",
+    "cypress",
+    "src/*.test.ts",
+    "src/*.test.tsx",
+    "src/*.test-d.ts",
+    "src/*.test-d.tsx",
+    "src/__mocks__"
+  ]
 }
