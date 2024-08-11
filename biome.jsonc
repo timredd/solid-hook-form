@@ -15,6 +15,9 @@
       "a11y": {
         "noBlankTarget": "error"
       },
+      "nursery": {
+        "noReactSpecificProps": "error"
+      },
       "complexity": {
         "noBannedTypes": "off",
         "noExtraBooleanCast": "error",
