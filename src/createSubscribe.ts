@@ -10,14 +10,14 @@ type Props<T> = {
 
 export function createSubscribe<T>(props: Props<T>) {
   const _props = Solid.useRef(props)
-  _props.current = props
+  _props = props
 
   Solid.createEffect(() => {
     const subscription =
       !props.disabled &&
-      _props.current.subject &&
-      _props.current.subject.subscribe({
-        next: _props.current.next,
+      _props.subject &&
+      _props.subject.subscribe({
+        next: _props.next,
       })
 
     return () => {

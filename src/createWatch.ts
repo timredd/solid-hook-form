@@ -154,7 +154,7 @@ export function createWatch<TFieldValues extends FieldValues>(
   } = props || {}
   const _name = Solid.useRef(name)
 
-  _name.current = name
+  _name = name
 
   createSubscribe({
     disabled,
@@ -162,7 +162,7 @@ export function createWatch<TFieldValues extends FieldValues>(
     next: (formState: { name?: InternalFieldName; values?: FieldValues }) => {
       if (
         shouldSubscribeByName(
-          _name.current as InternalFieldName,
+          _name as InternalFieldName,
           formState.name,
           exact,
         )
@@ -170,7 +170,7 @@ export function createWatch<TFieldValues extends FieldValues>(
         updateValue(
           cloneObject(
             generateWatchOutput(
-              _name.current as InternalFieldName | InternalFieldName[],
+              _name as InternalFieldName | InternalFieldName[],
               control._names,
               formState.values || control._formValues,
               false,

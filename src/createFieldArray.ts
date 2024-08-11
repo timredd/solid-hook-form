@@ -1,4 +1,4 @@
-import Solid from 'solid-js'
+import Solid, { on } from 'solid-js'
 
 import { VALIDATION_MODE } from './constants'
 import { createFormContext } from './createFormContext'
@@ -101,8 +101,8 @@ export function createFieldArray<
   const _name = Solid.useRef(name)
   const _actioned = Solid.useRef(false)
 
-  _name.current = name
-  _fieldIds.current = fields
+  _name = name
+  _fieldIds = fields
   control._names.array.add(name)
 
   props.rules &&
@@ -119,11 +119,11 @@ export function createFieldArray<
       values?: FieldValues
       name?: InternalFieldName
     }) => {
-      if (fieldArrayName === _name.current || !fieldArrayName) {
-        const fieldValues = get(values, _name.current)
+      if (fieldArrayName === _name || !fieldArrayName) {
+        const fieldValues = get(values, _name)
         if (Array.isArray(fieldValues)) {
           setFields(fieldValues)
-          ids.current = fieldValues.map(generateId)
+          ids = fieldValues.map(generateId)
         }
       }
     },
@@ -138,7 +138,7 @@ export function createFieldArray<
     >(
       updatedFieldArrayValues: T,
     ) => {
-      _actioned.current = true
+      _actioned = true
       control._updateFieldArray(name, updatedFieldArrayValues)
     },
     [control, name],
@@ -160,7 +160,7 @@ export function createFieldArray<
       updatedFieldArrayValues.length - 1,
       options,
     )
-    ids.current = appendAt(ids.current, appendValue.map(generateId))
+    ids = appendAt(ids, appendValue.map(generateId))
     updateValues(updatedFieldArrayValues)
     setFields(updatedFieldArrayValues)
     control._updateFieldArray(name, updatedFieldArrayValues, appendAt, {
@@ -180,7 +180,7 @@ export function createFieldArray<
       prependValue,
     )
     control._names.focus = getFocusFieldName(name, 0, options)
-    ids.current = prependAt(ids.current, prependValue.map(generateId))
+    ids = prependAt(ids, prependValue.map(generateId))
     updateValues(updatedFieldArrayValues)
     setFields(updatedFieldArrayValues)
     control._updateFieldArray(name, updatedFieldArrayValues, prependAt, {
@@ -192,7 +192,7 @@ export function createFieldArray<
     const updatedFieldArrayValues: Partial<
       FieldArrayWithId<TFieldValues, TFieldArrayName, TKeyName>
     >[] = removeArrayAt(control._getFieldArray(name), index)
-    ids.current = removeArrayAt(ids.current, index)
+    ids = removeArrayAt(ids, index)
     updateValues(updatedFieldArrayValues)
     setFields(updatedFieldArrayValues)
     control._updateFieldArray(name, updatedFieldArrayValues, removeArrayAt, {
@@ -214,7 +214,7 @@ export function createFieldArray<
       insertValue,
     )
     control._names.focus = getFocusFieldName(name, index, options)
-    ids.current = insertAt(ids.current, index, insertValue.map(generateId))
+    ids = insertAt(ids, index, insertValue.map(generateId))
     updateValues(updatedFieldArrayValues)
     setFields(updatedFieldArrayValues)
     control._updateFieldArray(name, updatedFieldArrayValues, insertAt, {
@@ -226,7 +226,7 @@ export function createFieldArray<
   const swap = (indexA: number, indexB: number) => {
     const updatedFieldArrayValues = control._getFieldArray(name)
     swapArrayAt(updatedFieldArrayValues, indexA, indexB)
-    swapArrayAt(ids.current, indexA, indexB)
+    swapArrayAt(ids, indexA, indexB)
     updateValues(updatedFieldArrayValues)
     setFields(updatedFieldArrayValues)
     control._updateFieldArray(
@@ -244,7 +244,7 @@ export function createFieldArray<
   const move = (from: number, to: number) => {
     const updatedFieldArrayValues = control._getFieldArray(name)
     moveArrayAt(updatedFieldArrayValues, from, to)
-    moveArrayAt(ids.current, from, to)
+    moveArrayAt(ids, from, to)
     updateValues(updatedFieldArrayValues)
     setFields(updatedFieldArrayValues)
     control._updateFieldArray(
@@ -271,8 +271,8 @@ export function createFieldArray<
       index,
       updateValue as FieldArrayWithId<TFieldValues, TFieldArrayName, TKeyName>,
     )
-    ids.current = [...updatedFieldArrayValues].map((item, i) =>
-      !item || i === index ? generateId() : ids.current[i],
+    ids = [...updatedFieldArrayValues].map((item, i) =>
+      !item || i === index ? generateId() : ids[i],
     )
     updateValues(updatedFieldArrayValues)
     setFields([...updatedFieldArrayValues])
@@ -295,7 +295,7 @@ export function createFieldArray<
       | Partial<FieldArray<TFieldValues, TFieldArrayName>>[],
   ) => {
     const updatedFieldArrayValues = convertToArrayPayload(cloneObject(value))
-    ids.current = updatedFieldArrayValues.map(generateId)
+    ids = updatedFieldArrayValues.map(generateId)
     updateValues([...updatedFieldArrayValues])
     setFields([...updatedFieldArrayValues])
     control._updateFieldArray(
@@ -317,7 +317,7 @@ export function createFieldArray<
       } as FormState<TFieldValues>)
 
     if (
-      _actioned.current &&
+      _actioned &&
       (!getValidationModes(control._options.mode).isOnSubmit ||
         control._formState.isSubmitted)
     ) {
@@ -394,7 +394,7 @@ export function createFieldArray<
     control._names.focus = ''
 
     control._updateValid()
-    _actioned.current = false
+    _actioned = false
   }, [fields, name, control])
 
   Solid.createEffect(() => {
@@ -407,21 +407,23 @@ export function createFieldArray<
   }, [name, control, keyName, shouldUnregister])
 
   return {
-    swap: Solid.useCallback(swap, [updateValues, name, control]),
-    move: Solid.useCallback(move, [updateValues, name, control]),
-    prepend: Solid.useCallback(prepend, [updateValues, name, control]),
-    append: Solid.useCallback(append, [updateValues, name, control]),
-    remove: Solid.useCallback(remove, [updateValues, name, control]),
-    insert: Solid.useCallback(insert, [updateValues, name, control]),
-    update: Solid.useCallback(update, [updateValues, name, control]),
-    replace: Solid.useCallback(replace, [updateValues, name, control]),
-    fields: Solid.useMemo(
-      () =>
-        fields.map((field, index) => ({
-          ...field,
-          [keyName]: ids.current[index] || generateId(),
-        })) as FieldArrayWithId<TFieldValues, TFieldArrayName, TKeyName>[],
-      [fields, keyName],
+    swap,
+    move,
+    prepend,
+    append,
+    remove,
+    insert,
+    update,
+    replace,
+    fields: Solid.createMemo(
+      on(
+        () => [fields, keyName],
+        () =>
+          fields.map((field, index) => ({
+            ...field,
+            [keyName]: ids[index] || generateId(),
+          })) as FieldArrayWithId<TFieldValues, TFieldArrayName, TKeyName>[],
+      ),
     ),
   }
 }

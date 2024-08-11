@@ -73,14 +73,14 @@ export function createForm<
       : props.defaultValues,
   })
 
-  if (!_formControl.current) {
-    _formControl.current = {
+  if (!_formControl) {
+    _formControl = {
       ...createFormControl(props),
       formState,
     }
   }
 
-  const control = _formControl.current.control
+  const control = _formControl.control
   control._options = props
 
   createSubscribe({
@@ -118,9 +118,9 @@ export function createForm<
   }, [control, formState.isDirty])
 
   Solid.createEffect(() => {
-    if (props.values && !deepEqual(props.values, _values.current)) {
+    if (props.values && !deepEqual(props.values, _values)) {
       control._reset(props.values, control._options.resetOptions)
-      _values.current = props.values
+      _values = props.values
       updateFormState((state) => ({ ...state }))
     } else {
       control._resetDefaultValues()
@@ -154,7 +154,7 @@ export function createForm<
       })
   }, [props.shouldUnregister, control])
 
-  _formControl.current.formState = getProxyFormState(formState, control)
+  _formControl.formState = getProxyFormState(formState, control)
 
-  return _formControl.current
+  return _formControl
 }

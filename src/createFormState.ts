@@ -62,22 +62,22 @@ function createFormState<TFieldValues extends FieldValues = FieldValues>(
   })
   const _name = Solid.useRef(name)
 
-  _name.current = name
+  _name = name
 
   createSubscribe({
     disabled,
     next: (
       value: Partial<FormState<TFieldValues>> & { name?: InternalFieldName },
     ) =>
-      _mounted.current &&
+      _mounted &&
       shouldSubscribeByName(
-        _name.current as InternalFieldName,
+        _name as InternalFieldName,
         value.name,
         exact,
       ) &&
       shouldRenderFormState(
         value,
-        _localProxyFormState.current,
+        _localProxyFormState,
         control._updateFormState,
       ) &&
       updateFormState({
@@ -88,18 +88,18 @@ function createFormState<TFieldValues extends FieldValues = FieldValues>(
   })
 
   Solid.createEffect(() => {
-    _mounted.current = true
-    _localProxyFormState.current.isValid && control._updateValid(true)
+    _mounted = true
+    _localProxyFormState.isValid && control._updateValid(true)
 
     return () => {
-      _mounted.current = false
+      _mounted = false
     }
   }, [control])
 
   return getProxyFormState(
     formState,
     control,
-    _localProxyFormState.current,
+    _localProxyFormState,
     false,
   )
 }

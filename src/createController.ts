@@ -133,7 +133,7 @@ export function createController<
         ? { disabled: formState.disabled || disabled }
         : {}),
       onChange: (event) =>
-        _registerProps.current.onChange({
+        _registerProps.onChange({
           target: {
             value: getEventValue(event),
             name: name as InternalFieldName,
@@ -141,7 +141,7 @@ export function createController<
           type: EVENTS.CHANGE,
         }),
       onBlur: () =>
-        _registerProps.current.onBlur({
+        _registerProps.onBlur({
           target: {
             value: get(control._formValues, name),
             name: name as InternalFieldName,
