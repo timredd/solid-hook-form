@@ -67,12 +67,12 @@ export type CriteriaMode = 'firstError' | 'all'
 
 export type SubmitHandler<TFieldValues extends FieldValues> = (
   data: TFieldValues,
-  event?: SubmitEvent, // or Event
+  event?: Event,
 ) => unknown | Promise<unknown>
 
 export type FormSubmitHandler<TFieldValues extends FieldValues> = (payload: {
   data: TFieldValues
-  event?: SubmitEvent // or Event
+  event?: Event
   formData: FormData
   formDataJson: string
   method?: 'post' | 'put' | 'delete'
@@ -80,7 +80,7 @@ export type FormSubmitHandler<TFieldValues extends FieldValues> = (payload: {
 
 export type SubmitErrorHandler<TFieldValues extends FieldValues> = (
   errors: FieldErrors<TFieldValues>,
-  event?: SubmitEvent,
+  event?: Event,
 ) => unknown | Promise<unknown>
 
 export type SetValueConfig = Partial<{
@@ -633,7 +633,7 @@ export type CreateFormHandleSubmit<
       ? SubmitHandler<TTransformedValues>
       : never,
   onInvalid?: SubmitErrorHandler<TFieldValues>,
-) => (e?: SubmitEvent) => Promise<void>
+) => (e?: Event) => Promise<void>
 
 /**
  * Reset a field state and reference.
