@@ -119,7 +119,7 @@ export type CreateFormProps<
   context: TContext
   shouldFocusError: boolean
   shouldUnregister: boolean
-  shouldCreateNativeValidation: boolean
+  shouldUseNativeValidation: boolean
   progressive: boolean
   criteriaMode: CriteriaMode
   delayError: number

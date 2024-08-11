@@ -1,16 +1,16 @@
-import Solid from 'solid-js'
+import Solid, { createEffect, createSignal, on } from 'solid-js'
 
+import { createSubscribe } from './createSubscribe'
 import { createFormControl } from './logic/createFormControl'
 import getProxyFormState from './logic/getProxyFormState'
 import shouldRenderFormState from './logic/shouldRenderFormState'
 import {
+  CreateFormProps,
+  CreateFormReturn,
   FieldValues,
   FormState,
   InternalFieldName,
-  CreateFormProps,
-  CreateFormReturn,
 } from './types'
-import { createSubscribe } from './createSubscribe'
 import deepEqual from './utils/deepEqual'
 import isFunction from './utils/isFunction'
 
@@ -50,11 +50,12 @@ export function createForm<
 >(
   props: CreateFormProps<TFieldValues, TContext> = {},
 ): CreateFormReturn<TFieldValues, TContext, TTransformedValues> {
-  const _formControl = Solid.useRef<
-    CreateFormReturn<TFieldValues, TContext, TTransformedValues> | undefined
-  >()
-  const _values = Solid.useRef<typeof props.values>()
-  const [formState, updateFormState] = Solid.createSignal<FormState<TFieldValues>>({
+  let _formControl:
+    | CreateFormReturn<TFieldValues, TContext, TTransformedValues>
+    | undefined
+  let _values: typeof props.values
+
+  const [formState, updateFormState] = createSignal<FormState<TFieldValues>>({
     isDirty: false,
     isValidating: false,
     isLoading: isFunction(props.defaultValues),
@@ -76,11 +77,11 @@ export function createForm<
   if (!_formControl) {
     _formControl = {
       ...createFormControl(props),
-      formState,
+      formState: formState(),
     }
   }
 
-  const control = _formControl.control
+  const control = _formControl?.control
   control._options = props
 
   createSubscribe({
@@ -101,23 +102,26 @@ export function createForm<
     },
   })
 
-  Solid.createEffect(
-    () => control._disableForm(props.disabled),
-    [control, props.disabled],
+  createEffect(
+    on([() => control, () => props.disabled], () =>
+      control._disableForm(props.disabled),
+    ),
   )
 
-  Solid.createEffect(() => {
-    if (control._proxyFormState.isDirty) {
-      const isDirty = control._getDirty()
-      if (isDirty !== formState.isDirty) {
-        control._subjects.state.next({
-          isDirty,
-        })
+  createEffect(
+    on([() => control, () => formState().isDirty], () => {
+      if (control._proxyFormState.isDirty) {
+        const isDirty = control._getDirty()
+        if (isDirty !== formState().isDirty) {
+          control._subjects.state.next({
+            isDirty,
+          })
+        }
       }
-    }
-  }, [control, formState.isDirty])
+    }),
+  )
 
-  Solid.createEffect(() => {
+  createEffect(() => {
     if (props.values && !deepEqual(props.values, _values)) {
       control._reset(props.values, control._options.resetOptions)
       _values = props.values
@@ -127,34 +131,40 @@ export function createForm<
     }
   }, [props.values, control])
 
-  Solid.createEffect(() => {
-    if (props.errors) {
-      control._setErrors(props.errors)
-    }
-  }, [props.errors, control])
+  createEffect(
+    on([() => props.errors, () => control], () => {
+      if (props.errors) {
+        control._setErrors(props.errors)
+      }
+    }),
+  )
 
-  Solid.createEffect(() => {
-    if (!control._state.mount) {
-      control._updateValid()
-      control._state.mount = true
-    }
+  createEffect(
+    on([], () => {
+      if (!control._state.mount) {
+        control._updateValid()
+        control._state.mount = true
+      }
 
-    if (control._state.watch) {
-      control._state.watch = false
-      control._subjects.state.next({ ...control._formState })
-    }
+      if (control._state.watch) {
+        control._state.watch = false
+        control._subjects.state.next({ ...control._formState })
+      }
 
-    control._removeUnmounted()
-  })
+      control._removeUnmounted()
+    }),
+  )
 
-  Solid.createEffect(() => {
-    props.shouldUnregister &&
-      control._subjects.values.next({
-        values: control._getWatch(),
-      })
-  }, [props.shouldUnregister, control])
+  createEffect(
+    on([() => props.shouldUnregister, () => control], () => {
+      props.shouldUnregister &&
+        control._subjects.values.next({
+          values: control._getWatch(),
+        })
+    }),
+  )
 
-  _formControl.formState = getProxyFormState(formState, control)
+  _formControl.formState = getProxyFormState(formState(), control)
 
   return _formControl
 }

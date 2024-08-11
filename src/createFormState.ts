@@ -1,17 +1,17 @@
-import Solid from 'solid-js'
+import { createEffect, createSignal, mergeProps, on, onMount } from 'solid-js'
 
+import { createFormContext } from './createFormContext'
+import { createSubscribe } from './createSubscribe'
 import getProxyFormState from './logic/getProxyFormState'
 import shouldRenderFormState from './logic/shouldRenderFormState'
 import shouldSubscribeByName from './logic/shouldSubscribeByName'
 import {
+  CreateFormStateProps,
+  CreateFormStateReturn,
   FieldValues,
   FormState,
   InternalFieldName,
-  CreateFormStateProps,
-  CreateFormStateReturn,
 } from './types'
-import { createFormContext } from './createFormContext'
-import { createSubscribe } from './createSubscribe'
 
 /**
  * This custom hook allows you to subscribe to each form state, and isolate the re-render at the custom hook level. It has its scope in terms of form state subscription, so it would not affect other createFormState and createForm. Using this hook can reduce the re-render impact on large and complex form application.
@@ -43,29 +43,54 @@ import { createSubscribe } from './createSubscribe'
  * }
  * ```
  */
+
 function createFormState<TFieldValues extends FieldValues = FieldValues>(
   props?: CreateFormStateProps<TFieldValues>,
 ): CreateFormStateReturn<TFieldValues> {
   const methods = createFormContext<TFieldValues>()
-  const { control = methods.control, disabled, name, exact } = props || {}
-  const [formState, updateFormState] = Solid.createSignal(control._formState)
-  const _mounted = Solid.useRef(true)
-  const _localProxyFormState = Solid.useRef({
-    isDirty: false,
-    isLoading: false,
-    dirtyFields: false,
-    touchedFields: false,
-    validatingFields: false,
-    isValidating: false,
-    isValid: false,
-    errors: false,
-  })
-  const _name = Solid.useRef(name)
+  const mergedProps = mergeProps({ control: methods.control }, props)
+  const [formState, updateFormState] = createSignal(
+    mergedProps.control._formState,
+  )
 
-  _name = name
+  let _mounted: boolean
+  onMount(() => {
+    _mounted = true
+  })
+
+  let _localProxyFormState = {} as {
+    [k in keyof Pick<
+      FormState<TFieldValues>,
+      | 'isDirty'
+      | 'isLoading'
+      | 'dirtyFields'
+      | 'touchedFields'
+      | 'validatingFields'
+      | 'isValidating'
+      | 'isValid'
+      | 'errors'
+    >]: boolean | 'all'
+  }
+  onMount(() => {
+    _localProxyFormState = {
+      isDirty: false,
+      isLoading: false,
+      dirtyFields: false,
+      touchedFields: false,
+      validatingFields: false,
+      isValidating: false,
+      isValid: false,
+      errors: false,
+    }
+  })
+
+  let _name: CreateFormStateProps<TFieldValues>['name']
+  onMount(() => {
+    _name = mergedProps.name
+  })
 
   createSubscribe({
-    disabled,
+    disabled: mergedProps.disabled,
     next: (
       value: Partial<FormState<TFieldValues>> & { name?: InternalFieldName },
     ) =>
@@ -73,32 +98,37 @@ function createFormState<TFieldValues extends FieldValues = FieldValues>(
       shouldSubscribeByName(
         _name as InternalFieldName,
         value.name,
-        exact,
+        mergedProps.exact,
       ) &&
       shouldRenderFormState(
         value,
         _localProxyFormState,
-        control._updateFormState,
+        mergedProps.control._updateFormState,
       ) &&
       updateFormState({
-        ...control._formState,
+        ...mergedProps.control._formState,
         ...value,
       }),
-    subject: control._subjects.state,
+    subject: mergedProps.control._subjects.state,
   })
 
-  Solid.createEffect(() => {
-    _mounted = true
-    _localProxyFormState.isValid && control._updateValid(true)
+  createEffect(
+    on(
+      () => mergedProps.control,
+      () => {
+        _mounted = true
+        _localProxyFormState.isValid && mergedProps.control._updateValid(true)
 
-    return () => {
-      _mounted = false
-    }
-  }, [control])
+        return () => {
+          _mounted = false
+        }
+      },
+    ),
+  )
 
   return getProxyFormState(
-    formState,
-    control,
+    formState(),
+    mergedProps.control,
     _localProxyFormState,
     false,
   )

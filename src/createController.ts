@@ -16,6 +16,7 @@ import {
   FieldValues,
   InternalFieldName,
 } from './types'
+import cloneObject from './utils/cloneObject'
 import get from './utils/get'
 import isBoolean from './utils/isBoolean'
 import isUndefined from './utils/isUndefined'
@@ -52,73 +53,100 @@ export function createController<
   props: CreateControllerProps<TFieldValues, TName>,
 ): CreateControllerReturn<TFieldValues, TName> {
   const methods = createFormContext<TFieldValues>()
-  const { name, disabled, control = methods.control, shouldUnregister } = props
-  const isArrayField = isNameInFieldArray(control._names.array, name)
+  // const { name, disabled, control = methods.control, shouldUnregister } = props
+  const mergedProps = mergeProps({ control: methods.control }, props)
+  const isArrayField = isNameInFieldArray(
+    mergedProps.control._names.array,
+    mergedProps.name,
+  )
   const value = createWatch({
-    control,
-    name,
+    control: mergedProps.control,
+    name: mergedProps.name,
     defaultValue: get(
-      control._formValues,
-      name,
-      get(control._defaultValues, name, props.defaultValue),
+      mergedProps.control._formValues,
+      mergedProps.name,
+      get(
+        mergedProps.control._defaultValues,
+        mergedProps.name,
+        props.defaultValue,
+      ),
     ),
     exact: true,
   }) as FieldPathValue<TFieldValues, TName>
   const formState = createFormState({
-    control,
-    name,
+    control: mergedProps.control,
+    name: mergedProps.name,
     exact: true,
   })
 
-  const _registerProps = control.register(name, {
+  const _registerProps = mergedProps.control.register(mergedProps.name, {
     ...props.rules,
     value,
     ...(isBoolean(props.disabled) ? { disabled: props.disabled } : {}),
   })
 
-  createEffect(() => {
-    const _shouldUnregisterField =
-      control._options.shouldUnregister || shouldUnregister
+  createEffect(
+    on(
+      [
+        () => mergedProps.name,
+        () => mergedProps.control,
+        () => isArrayField,
+        () => mergedProps.shouldUnregister,
+      ],
+      () => {
+        const _shouldUnregisterField =
+          mergedProps.control._options.shouldUnregister ||
+          mergedProps.shouldUnregister
 
-    const updateMounted = (name: InternalFieldName, value: boolean) => {
-      const field: Field = get(control._fields, name)
+        const updateMounted = (name: InternalFieldName, value: boolean) => {
+          const field: Field = get(mergedProps.control._fields, name)
 
-      if (field && field._f) {
-        field._f.mount = value
-      }
-    }
+          if (field && field._f) {
+            field._f.mount = value
+          }
+        }
 
-    updateMounted(name, true)
+        updateMounted(mergedProps.name, true)
 
-    if (_shouldUnregisterField) {
-      const value = mergeProps(get(control._options.defaultValues, name))
-      set(control._defaultValues, name, value)
-      if (isUndefined(get(control._formValues, name))) {
-        set(control._formValues, name, value)
-      }
-    }
+        if (_shouldUnregisterField) {
+          const value = cloneObject(
+            get(mergedProps.control._options.defaultValues, mergedProps.name),
+          )
+          set(mergedProps.control._defaultValues, mergedProps.name, value)
+          if (
+            isUndefined(get(mergedProps.control._formValues, mergedProps.name))
+          ) {
+            set(mergedProps.control._formValues, mergedProps.name, value)
+          }
+        }
 
-    return () => {
-      ;(
-        isArrayField
-          ? _shouldUnregisterField && !control._state.action
-          : _shouldUnregisterField
-      )
-        ? control.unregister(name)
-        : updateMounted(name, false)
-    }
-  }, [name, control, isArrayField, shouldUnregister])
+        return () => {
+          ;(
+            isArrayField
+              ? _shouldUnregisterField && !mergedProps.control._state.action
+              : _shouldUnregisterField
+          )
+            ? mergedProps.control.unregister(mergedProps.name)
+            : updateMounted(mergedProps.name, false)
+        }
+      },
+    ),
+  )
 
   createEffect(
     on(
-      () => [disabled, name, control],
+      [
+        () => mergedProps.disabled,
+        () => mergedProps.name,
+        () => mergedProps.control,
+      ],
       () => {
-        if (get(control._fields, name)) {
-          control._updateDisabledField({
-            disabled,
-            fields: control._fields,
-            name,
-            value: get(control._fields, name)._f.value,
+        if (get(mergedProps.control._fields, mergedProps.name)) {
+          mergedProps.control._updateDisabledField({
+            disabled: mergedProps.disabled,
+            fields: mergedProps.control._fields,
+            name: mergedProps.name,
+            value: get(mergedProps.control._fields, mergedProps.name)._f.value,
           })
         }
       },
@@ -127,29 +155,29 @@ export function createController<
 
   return {
     field: {
-      name,
+      name: mergedProps.name,
       value,
-      ...(isBoolean(disabled) || formState.disabled
-        ? { disabled: formState.disabled || disabled }
+      ...(isBoolean(mergedProps.disabled) || formState.disabled
+        ? { disabled: formState.disabled || mergedProps.disabled }
         : {}),
       onChange: (event) =>
         _registerProps.onChange({
           target: {
             value: getEventValue(event),
-            name: name as InternalFieldName,
+            name: mergedProps.name as InternalFieldName,
           },
           type: EVENTS.CHANGE,
         }),
       onBlur: () =>
         _registerProps.onBlur({
           target: {
-            value: get(control._formValues, name),
-            name: name as InternalFieldName,
+            value: get(mergedProps.control._formValues, mergedProps.name),
+            name: mergedProps.name as InternalFieldName,
           },
           type: EVENTS.BLUR,
         }),
       ref: (elm) => {
-        const field = get(control._fields, name)
+        const field = get(mergedProps.control._fields, mergedProps.name)
 
         if (field && elm) {
           field._f.ref = {
@@ -168,23 +196,23 @@ export function createController<
       {
         invalid: {
           enumerable: true,
-          get: () => !!get(formState.errors, name),
+          get: () => !!get(formState.errors, mergedProps.name),
         },
         isDirty: {
           enumerable: true,
-          get: () => !!get(formState.dirtyFields, name),
+          get: () => !!get(formState.dirtyFields, mergedProps.name),
         },
         isTouched: {
           enumerable: true,
-          get: () => !!get(formState.touchedFields, name),
+          get: () => !!get(formState.touchedFields, mergedProps.name),
         },
         isValidating: {
           enumerable: true,
-          get: () => !!get(formState.validatingFields, name),
+          get: () => !!get(formState.validatingFields, mergedProps.name),
         },
         error: {
           enumerable: true,
-          get: () => get(formState.errors, name),
+          get: () => get(formState.errors, mergedProps.name),
         },
       },
     ) as ControllerFieldState,

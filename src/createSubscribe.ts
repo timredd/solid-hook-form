@@ -1,4 +1,4 @@
-import Solid from 'solid-js'
+import { createEffect, on } from 'solid-js'
 
 import { Subject } from './utils/createSubject'
 
@@ -9,19 +9,21 @@ type Props<T> = {
 }
 
 export function createSubscribe<T>(props: Props<T>) {
-  const _props = Solid.useRef(props)
-  _props = props
+  createEffect(
+    on(
+      () => props.disabled,
+      () => {
+        const subscription =
+          !props.disabled &&
+          props.subject &&
+          props.subject.subscribe({
+            next: props.next,
+          })
 
-  Solid.createEffect(() => {
-    const subscription =
-      !props.disabled &&
-      _props.subject &&
-      _props.subject.subscribe({
-        next: _props.next,
-      })
-
-    return () => {
-      subscription && subscription.unsubscribe()
-    }
-  }, [props.disabled])
+        return () => {
+          subscription && subscription.unsubscribe()
+        }
+      },
+    ),
+  )
 }

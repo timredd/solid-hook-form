@@ -68,6 +68,7 @@ import live from '../utils/live'
 import set from '../utils/set'
 import unset from '../utils/unset'
 
+import cloneObject from '../utils/cloneObject'
 import generateWatchOutput from './generateWatchOutput'
 import getDirtyFields from './getDirtyFields'
 import getEventValue from './getEventValue'
@@ -410,7 +411,7 @@ export function createFormControl<
         name || _names.mount,
         _fields,
         _options.criteriaMode,
-        _options.shouldCreateNativeValidation,
+        _options.shouldUseNativeValidation,
       ),
     )
     _updateIsValidating(name)
@@ -418,7 +419,7 @@ export function createFormControl<
   }
 
   const executeSchemaAndUpdateState = async (names?: InternalFieldName[]) => {
-    const { errors } = await _executeSchema(names)
+    const errors = await _executeSchema(names).then((result) => result.errors)
 
     if (names) {
       for (const name of names) {
@@ -456,7 +457,7 @@ export function createFormControl<
             field,
             _formValues,
             shouldDisplayAllAssociatedErrors,
-            _options.shouldCreateNativeValidation && !shouldOnlyCheckValid,
+            _options.shouldUseNativeValidation && !shouldOnlyCheckValid,
             isFieldArrayRoot,
           )
           _updateIsValidating([name])
@@ -645,7 +646,7 @@ export function createFormControl<
   ) => {
     const field = get(_fields, name)
     const isFieldArray = _names.array.has(name)
-    const cloneValue = mergeProps(value)
+    const cloneValue = cloneObject(value)
 
     set(_formValues, name, cloneValue)
 
@@ -777,7 +778,7 @@ export function createFormControl<
             field,
             _formValues,
             shouldDisplayAllAssociatedErrors,
-            _options.shouldCreateNativeValidation,
+            _options.shouldUseNativeValidation,
           )
         )[name]
         _updateIsValidating([name])
@@ -1181,7 +1182,7 @@ export function createFormControl<
   ) => {
     if (get(_fields, name)) {
       if (isUndefined(options.defaultValue)) {
-        setValue(name, mergeProps(get(_defaultValues, name)))
+        setValue(name, cloneObject(get(_defaultValues, name)))
       } else {
         setValue(
           name,

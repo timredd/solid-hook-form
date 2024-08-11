@@ -1,5 +1,4 @@
-import Solid from 'solid-js'
-import { mergeProps } from 'solid-js'
+import { createEffect, createSignal, mergeProps, onMount } from 'solid-js'
 
 import { createFormContext } from './createFormContext'
 import { createSubscribe } from './createSubscribe'
@@ -144,33 +143,33 @@ export function createWatch<
 export function createWatch<TFieldValues extends FieldValues>(
   props?: CreateWatchProps<TFieldValues>,
 ) {
-  const methods = createFormContext()
-  const {
-    control = methods.control,
-    name,
-    defaultValue,
-    disabled,
-    exact,
-  } = props || {}
-  const _name = Solid.useRef(name)
+  const methods = createFormContext<TFieldValues>()
+  const mergedProps = mergeProps({ control: methods.control }, props)
 
-  _name = name
+  let _name: CreateWatchProps<TFieldValues>['name']
+  onMount(() => {
+    _name = mergedProps.name
+  })
 
   createSubscribe({
-    disabled,
-    subject: control._subjects.values,
+    disabled: mergedProps?.disabled,
+    subject: mergedProps?.control._subjects.values,
     next: (formState: { name?: InternalFieldName; values?: FieldValues }) => {
       if (
-        shouldSubscribeByName(_name as InternalFieldName, formState.name, exact)
+        shouldSubscribeByName(
+          mergedProps.name as InternalFieldName,
+          formState.name,
+          mergedProps.exact,
+        )
       ) {
         updateValue(
           mergeProps(
             generateWatchOutput(
-              _name as InternalFieldName | InternalFieldName[],
-              control._names,
-              formState.values || control._formValues,
+              mergedProps.name as InternalFieldName | InternalFieldName[],
+              mergedProps.control._names,
+              formState.values || mergedProps.control._formValues,
               false,
-              defaultValue,
+              mergedProps.defaultValue,
             ),
           ),
         )
@@ -178,14 +177,14 @@ export function createWatch<TFieldValues extends FieldValues>(
     },
   })
 
-  const [value, updateValue] = Solid.createSignal(
-    control._getWatch(
-      name as InternalFieldName,
-      defaultValue as DeepPartialSkipArrayKey<TFieldValues>,
+  const [value, updateValue] = createSignal(
+    mergedProps.control._getWatch(
+      mergedProps.name as InternalFieldName,
+      mergedProps.defaultValue as DeepPartialSkipArrayKey<TFieldValues>,
     ),
   )
 
-  Solid.createEffect(() => control._removeUnmounted())
+  createEffect(() => mergedProps.control._removeUnmounted())
 
   return value
 }

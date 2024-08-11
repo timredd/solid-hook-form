@@ -3,13 +3,14 @@ import { createFormControl } from '../../logic/createFormControl'
 import isEmptyObject from '../../utils/isEmptyObject'
 
 vi.mock('../../utils/isEmptyObject', async () => {
+  const original = await vi.importActual('../../utils/isEmptyObject')
   return {
     __esModule: true,
-    default: vi.fn(),
+    default: vi.fn(() => original),
   }
 })
 
-describe('createFormControl', () => {
+describe('createFormControl', async () => {
   it('should call `executeBuiltInValidation` once for a single field', async () => {
     const formControl = createFormControl({
       defaultValues: {
