@@ -1,5 +1,4 @@
 import {
-  act,
   fireEvent,
   render,
   renderHook,
@@ -8,21 +7,19 @@ import {
 } from '@solidjs/testing-library'
 import { describe, expect, it, vi } from 'vitest'
 
-import { createEffect, on } from 'solid-js'
+import { Show, createEffect, on } from 'solid-js'
 import { createForm } from '../../createForm'
 
 describe('clearErrors', () => {
   it('should remove error', () => {
     const { result } = renderHook(() => createForm<{ input: string }>())
-    act(() => {
-      result.register('input')
-      result.setError('input', {
-        type: 'test',
-        message: 'message',
-      })
+    result.register('input')
+    result.setError('input', {
+      type: 'test',
+      message: 'message',
     })
 
-    act(() => result.clearErrors('input'))
+    result.clearErrors('input')
 
     expect(result.formState.errors).toEqual({})
   })
@@ -31,14 +28,16 @@ describe('clearErrors', () => {
     const { result } = renderHook(() =>
       createForm<{ input: { nested: string } }>(),
     )
+
     result.formState.errors
-    act(() =>
-      result.setError('input.nested', {
-        type: 'test',
-      }),
-    )
+    result.setError('input.nested', {
+      type: 'test',
+    })
+
     expect(result.formState.errors.input?.nested).toBeDefined()
-    act(() => result.clearErrors('input.nested'))
+
+    result.clearErrors('input.nested')
+
     expect(result.formState.errors.input?.nested).toBeUndefined()
   })
 
@@ -107,19 +106,17 @@ describe('clearErrors', () => {
       message: 'message',
     }
 
-    act(() => {
-      result.register('input')
-      result.register('input1')
-      result.register('input2')
-      result.setError('input', error)
-      result.setError('input1', error)
-      result.setError('input2', error)
+    result.register('input')
+    result.register('input1')
+    result.register('input2')
+    result.setError('input', error)
+    result.setError('input1', error)
+    result.setError('input2', error)
 
-      result.register('nest.data')
-      result.register('nest.data1')
-      result.setError('nest.data', error)
-      result.setError('nest.data1', error)
-    })
+    result.register('nest.data')
+    result.register('nest.data1')
+    result.setError('nest.data', error)
+    result.setError('nest.data1', error)
 
     const errors = {
       input: {
@@ -157,7 +154,7 @@ describe('clearErrors', () => {
     }
     expect(result.formState.errors).toEqual(errors)
 
-    act(() => result.clearErrors(['input', 'input1', 'nest.data']))
+    result.clearErrors(['input', 'input1', 'nest.data'])
     expect(result.formState.errors).toEqual({
       input2: errors.input2,
       nest: {
@@ -177,9 +174,10 @@ describe('clearErrors', () => {
       type: 'test',
       message: 'message',
     }
-    act(() => result.setError('input', error))
-    act(() => result.setError('input1', error))
-    act(() => result.setError('input2', error))
+    result.setError('input', error)
+    result.setError('input1', error)
+    result.setError('input2', error)
+
     expect(result.formState.errors).toEqual({
       input: {
         ...error,
@@ -198,7 +196,7 @@ describe('clearErrors', () => {
       },
     })
 
-    act(() => result.clearErrors())
+    result.clearErrors()
     expect(result.formState.errors).toEqual({})
   })
 
@@ -210,25 +208,20 @@ describe('clearErrors', () => {
 
     result.register('data')
 
-    act(() => {
-      result.setError('whatever', { type: 'server' })
-    })
+    result.setError('whatever', { type: 'server' })
 
-    await act(async () => await result.handleSubmit(submit)())
+    await result.handleSubmit(submit)()
     expect(submit).not.toBeCalled()
 
-    act(() => {
-      result.clearErrors('whatever')
-    })
+    result.clearErrors('whatever')
 
-    await act(async () => await result.handleSubmit(submit)())
+    await result.handleSubmit(submit)()
     expect(submit).toBeCalled()
   })
 
   it('should update isValid to true with setError', async () => {
     const App = () => {
       const form = createForm({ mode: 'onChange' })
-      const isValid = () => form.formState.isValid
 
       return (
         <div>
@@ -247,22 +240,24 @@ describe('clearErrors', () => {
           >
             clearError
           </button>
-          {isValid() ? 'yes' : 'no'}
+          <Show when={form.formState.isValid} fallback={'no'}>
+            {'yes'}
+          </Show>
         </div>
       )
     }
 
-    render(() => <App />)
+    const { findByText, getByRole } = render(() => <App />)
 
-    expect(await screen.findByText('yes')).toBeVisible()
+    expect(await findByText('yes')).toBeVisible()
 
-    fireEvent.click(screen.getByRole('button', { name: 'setError' }))
+    fireEvent.click(getByRole('button', { name: 'setError' }))
 
-    expect(await screen.findByText('no')).toBeVisible()
+    expect(await findByText('no')).toBeVisible()
 
-    fireEvent.click(screen.getByRole('button', { name: 'clearError' }))
+    fireEvent.click(getByRole('button', { name: 'clearError' }))
 
-    expect(await screen.findByText('no')).toBeVisible()
+    expect(await findByText('no')).toBeVisible()
   })
 
   it('should be able to clear root error', () => {
