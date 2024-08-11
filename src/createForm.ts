@@ -1,4 +1,4 @@
-import React from 'react'
+import Solid from 'solid-js'
 
 import { createFormControl } from './logic/createFormControl'
 import getProxyFormState from './logic/getProxyFormState'
@@ -7,10 +7,10 @@ import {
   FieldValues,
   FormState,
   InternalFieldName,
-  UseFormProps,
-  UseFormReturn,
+  CreateFormProps,
+  CreateFormReturn,
 } from './types'
-import { useSubscribe } from './useSubscribe'
+import { createSubscribe } from './createSubscribe'
 import deepEqual from './utils/deepEqual'
 import isFunction from './utils/isFunction'
 
@@ -22,12 +22,12 @@ import isFunction from './utils/isFunction'
  *
  * @param props - form configuration and validation parameters.
  *
- * @returns methods - individual functions to manage the form state. {@link UseFormReturn}
+ * @returns methods - individual functions to manage the form state. {@link CreateFormReturn}
  *
  * @example
  * ```tsx
  * function App() {
- *   const { register, handleSubmit, watch, formState: { errors } } = useForm();
+ *   const { register, handleSubmit, watch, formState: { errors } } = createForm();
  *   const onSubmit = data => console.log(data);
  *
  *   console.log(watch("example"));
@@ -43,18 +43,18 @@ import isFunction from './utils/isFunction'
  * }
  * ```
  */
-export function useForm<
+export function createForm<
   TFieldValues extends FieldValues = FieldValues,
   TContext = any,
   TTransformedValues extends FieldValues | undefined = undefined,
 >(
-  props: UseFormProps<TFieldValues, TContext> = {},
-): UseFormReturn<TFieldValues, TContext, TTransformedValues> {
-  const _formControl = React.useRef<
-    UseFormReturn<TFieldValues, TContext, TTransformedValues> | undefined
+  props: CreateFormProps<TFieldValues, TContext> = {},
+): CreateFormReturn<TFieldValues, TContext, TTransformedValues> {
+  const _formControl = Solid.useRef<
+    CreateFormReturn<TFieldValues, TContext, TTransformedValues> | undefined
   >()
-  const _values = React.useRef<typeof props.values>()
-  const [formState, updateFormState] = React.useState<FormState<TFieldValues>>({
+  const _values = Solid.useRef<typeof props.values>()
+  const [formState, updateFormState] = Solid.createSignal<FormState<TFieldValues>>({
     isDirty: false,
     isValidating: false,
     isLoading: isFunction(props.defaultValues),
@@ -83,7 +83,7 @@ export function useForm<
   const control = _formControl.current.control
   control._options = props
 
-  useSubscribe({
+  createSubscribe({
     subject: control._subjects.state,
     next: (
       value: Partial<FormState<TFieldValues>> & { name?: InternalFieldName },
@@ -101,12 +101,12 @@ export function useForm<
     },
   })
 
-  React.useEffect(
+  Solid.createEffect(
     () => control._disableForm(props.disabled),
     [control, props.disabled],
   )
 
-  React.useEffect(() => {
+  Solid.createEffect(() => {
     if (control._proxyFormState.isDirty) {
       const isDirty = control._getDirty()
       if (isDirty !== formState.isDirty) {
@@ -117,7 +117,7 @@ export function useForm<
     }
   }, [control, formState.isDirty])
 
-  React.useEffect(() => {
+  Solid.createEffect(() => {
     if (props.values && !deepEqual(props.values, _values.current)) {
       control._reset(props.values, control._options.resetOptions)
       _values.current = props.values
@@ -127,13 +127,13 @@ export function useForm<
     }
   }, [props.values, control])
 
-  React.useEffect(() => {
+  Solid.createEffect(() => {
     if (props.errors) {
       control._setErrors(props.errors)
     }
   }, [props.errors, control])
 
-  React.useEffect(() => {
+  Solid.createEffect(() => {
     if (!control._state.mount) {
       control._updateValid()
       control._state.mount = true
@@ -147,7 +147,7 @@ export function useForm<
     control._removeUnmounted()
   })
 
-  React.useEffect(() => {
+  Solid.createEffect(() => {
     props.shouldUnregister &&
       control._subjects.values.next({
         values: control._getWatch(),

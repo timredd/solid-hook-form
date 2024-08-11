@@ -1,19 +1,19 @@
 import Solid from 'solid-js'
 
+import { createFormContext } from './createFormContext'
+import { createSubscribe } from './createSubscribe'
 import generateWatchOutput from './logic/generateWatchOutput'
 import shouldSubscribeByName from './logic/shouldSubscribeByName'
 import {
   Control,
+  CreateWatchProps,
   DeepPartialSkipArrayKey,
   FieldPath,
   FieldPathValue,
   FieldPathValues,
   FieldValues,
   InternalFieldName,
-  UseWatchProps,
 } from './types'
-import { useFormContext } from './useFormContext'
-import { useSubscribe } from './useSubscribe'
 import cloneObject from './utils/cloneObject'
 
 /**
@@ -27,8 +27,8 @@ import cloneObject from './utils/cloneObject'
  *
  * @example
  * ```tsx
- * const { control } = useForm();
- * const values = useWatch({
+ * const { control } = createForm();
+ * const values = createWatch({
  *   control,
  *   defaultValue: {
  *     name: "data"
@@ -37,7 +37,7 @@ import cloneObject from './utils/cloneObject'
  * })
  * ```
  */
-export function useWatch<
+export function createWatch<
   TFieldValues extends FieldValues = FieldValues,
 >(props: {
   defaultValue?: DeepPartialSkipArrayKey<TFieldValues>
@@ -56,8 +56,8 @@ export function useWatch<
  *
  * @example
  * ```tsx
- * const { control } = useForm();
- * const values = useWatch({
+ * const { control } = createForm();
+ * const values = createWatch({
  *   control,
  *   name: "fieldA",
  *   defaultValue: "default value",
@@ -65,7 +65,7 @@ export function useWatch<
  * })
  * ```
  */
-export function useWatch<
+export function createWatch<
   TFieldValues extends FieldValues = FieldValues,
   TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(props: {
@@ -86,8 +86,8 @@ export function useWatch<
  *
  * @example
  * ```tsx
- * const { control } = useForm();
- * const values = useWatch({
+ * const { control } = createForm();
+ * const values = createWatch({
  *   control,
  *   name: ["fieldA", "fieldB"],
  *   defaultValue: {
@@ -98,7 +98,7 @@ export function useWatch<
  * })
  * ```
  */
-export function useWatch<
+export function createWatch<
   TFieldValues extends FieldValues = FieldValues,
   TFieldNames extends
     readonly FieldPath<TFieldValues>[] = readonly FieldPath<TFieldValues>[],
@@ -118,11 +118,11 @@ export function useWatch<
  *
  * @example
  * ```tsx
- * // can skip passing down the control into useWatch if the form is wrapped with the FormProvider
- * const values = useWatch()
+ * // can skip passing down the control into createWatch if the form is wrapped with the FormProvider
+ * const values = createWatch()
  * ```
  */
-export function useWatch<
+export function createWatch<
   TFieldValues extends FieldValues = FieldValues,
 >(): DeepPartialSkipArrayKey<TFieldValues>
 /**
@@ -134,17 +134,17 @@ export function useWatch<
  *
  * @example
  * ```tsx
- * const { control } = useForm();
- * const values = useWatch({
+ * const { control } = createForm();
+ * const values = createWatch({
  *   name: "fieldName"
  *   control,
  * })
  * ```
  */
-export function useWatch<TFieldValues extends FieldValues>(
-  props?: UseWatchProps<TFieldValues>,
+export function createWatch<TFieldValues extends FieldValues>(
+  props?: CreateWatchProps<TFieldValues>,
 ) {
-  const methods = useFormContext()
+  const methods = createFormContext()
   const {
     control = methods.control,
     name,
@@ -152,11 +152,11 @@ export function useWatch<TFieldValues extends FieldValues>(
     disabled,
     exact,
   } = props || {}
-  const _name = React.useRef(name)
+  const _name = Solid.useRef(name)
 
   _name.current = name
 
-  useSubscribe({
+  createSubscribe({
     disabled,
     subject: control._subjects.values,
     next: (formState: { name?: InternalFieldName; values?: FieldValues }) => {
@@ -182,14 +182,14 @@ export function useWatch<TFieldValues extends FieldValues>(
     },
   })
 
-  const [value, updateValue] = React.useState(
+  const [value, updateValue] = Solid.createSignal(
     control._getWatch(
       name as InternalFieldName,
       defaultValue as DeepPartialSkipArrayKey<TFieldValues>,
     ),
   )
 
-  React.useEffect(() => control._removeUnmounted())
+  Solid.createEffect(() => control._removeUnmounted())
 
   return value
 }

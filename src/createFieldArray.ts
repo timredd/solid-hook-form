@@ -111,7 +111,7 @@ export function createFieldArray<
       props.rules as RegisterOptions<TFieldValues>,
     )
 
-  useSubscribe({
+  createSubscribe({
     next: ({
       values,
       name: fieldArrayName,
@@ -308,7 +308,7 @@ export function createFieldArray<
     )
   }
 
-  Solid.useEffect(() => {
+  Solid.createEffect(() => {
     control._state.action = false
 
     isWatched(name, control._names) &&
@@ -397,7 +397,7 @@ export function createFieldArray<
     _actioned.current = false
   }, [fields, name, control])
 
-  Solid.useEffect(() => {
+  Solid.createEffect(() => {
     !get(control._formValues, name) && control._updateFieldArray(name)
 
     return () => {

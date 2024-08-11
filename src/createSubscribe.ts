@@ -8,11 +8,11 @@ type Props<T> = {
   next: (value: T) => void
 }
 
-export function useSubscribe<T>(props: Props<T>) {
-  const _props = React.useRef(props)
+export function createSubscribe<T>(props: Props<T>) {
+  const _props = Solid.useRef(props)
   _props.current = props
 
-  React.useEffect(() => {
+  Solid.createEffect(() => {
     const subscription =
       !props.disabled &&
       _props.current.subject &&

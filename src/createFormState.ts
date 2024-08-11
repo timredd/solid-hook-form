@@ -1,4 +1,4 @@
-import React from 'react'
+import Solid from 'solid-js'
 
 import getProxyFormState from './logic/getProxyFormState'
 import shouldRenderFormState from './logic/shouldRenderFormState'
@@ -7,28 +7,28 @@ import {
   FieldValues,
   FormState,
   InternalFieldName,
-  UseFormStateProps,
-  UseFormStateReturn,
+  CreateFormStateProps,
+  CreateFormStateReturn,
 } from './types'
-import { useFormContext } from './useFormContext'
-import { useSubscribe } from './useSubscribe'
+import { createFormContext } from './createFormContext'
+import { createSubscribe } from './createSubscribe'
 
 /**
- * This custom hook allows you to subscribe to each form state, and isolate the re-render at the custom hook level. It has its scope in terms of form state subscription, so it would not affect other useFormState and useForm. Using this hook can reduce the re-render impact on large and complex form application.
+ * This custom hook allows you to subscribe to each form state, and isolate the re-render at the custom hook level. It has its scope in terms of form state subscription, so it would not affect other createFormState and createForm. Using this hook can reduce the re-render impact on large and complex form application.
  *
  * @remarks
  * [API](https://react-hook-form.com/docs/useformstate) • [Demo](https://codesandbox.io/s/useformstate-75xly)
  *
- * @param props - include options on specify fields to subscribe. {@link UseFormStateReturn}
+ * @param props - include options on specify fields to subscribe. {@link CreateFormStateReturn}
  *
  * @example
  * ```tsx
  * function App() {
- *   const { register, handleSubmit, control } = useForm({
+ *   const { register, handleSubmit, control } = createForm({
  *     defaultValues: {
  *     firstName: "firstName"
  *   }});
- *   const { dirtyFields } = useFormState({
+ *   const { dirtyFields } = createFormState({
  *     control
  *   });
  *   const onSubmit = (data) => console.log(data);
@@ -43,14 +43,14 @@ import { useSubscribe } from './useSubscribe'
  * }
  * ```
  */
-function useFormState<TFieldValues extends FieldValues = FieldValues>(
-  props?: UseFormStateProps<TFieldValues>,
-): UseFormStateReturn<TFieldValues> {
-  const methods = useFormContext<TFieldValues>()
+function createFormState<TFieldValues extends FieldValues = FieldValues>(
+  props?: CreateFormStateProps<TFieldValues>,
+): CreateFormStateReturn<TFieldValues> {
+  const methods = createFormContext<TFieldValues>()
   const { control = methods.control, disabled, name, exact } = props || {}
-  const [formState, updateFormState] = React.useState(control._formState)
-  const _mounted = React.useRef(true)
-  const _localProxyFormState = React.useRef({
+  const [formState, updateFormState] = Solid.createSignal(control._formState)
+  const _mounted = Solid.useRef(true)
+  const _localProxyFormState = Solid.useRef({
     isDirty: false,
     isLoading: false,
     dirtyFields: false,
@@ -60,11 +60,11 @@ function useFormState<TFieldValues extends FieldValues = FieldValues>(
     isValid: false,
     errors: false,
   })
-  const _name = React.useRef(name)
+  const _name = Solid.useRef(name)
 
   _name.current = name
 
-  useSubscribe({
+  createSubscribe({
     disabled,
     next: (
       value: Partial<FormState<TFieldValues>> & { name?: InternalFieldName },
@@ -87,7 +87,7 @@ function useFormState<TFieldValues extends FieldValues = FieldValues>(
     subject: control._subjects.state,
   })
 
-  React.useEffect(() => {
+  Solid.createEffect(() => {
     _mounted.current = true
     _localProxyFormState.current.isValid && control._updateValid(true)
 
@@ -104,4 +104,4 @@ function useFormState<TFieldValues extends FieldValues = FieldValues>(
   )
 }
 
-export { useFormState }
+export { createFormState }
