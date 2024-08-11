@@ -1,21 +1,21 @@
-import React from 'react'
+import Solid from 'solid-js'
 
-import { FieldValues, FormProviderProps, UseFormReturn } from './types'
+import { FieldValues, FormProviderProps, CreateFormReturn } from './types'
 
-const HookFormContext = React.createContext<UseFormReturn | null>(null)
+const HookFormContext = Solid.createContext<CreateFormReturn | null>(null)
 
 /**
- * This custom hook allows you to access the form context. useFormContext is intended to be used in deeply nested structures, where it would become inconvenient to pass the context as a prop. To be used with {@link FormProvider}.
+ * This custom hook allows you to access the form context. createFormContext is intended to be used in deeply nested structures, where it would become inconvenient to pass the context as a prop. To be used with {@link FormProvider}.
  *
  * @remarks
  * [API](https://react-hook-form.com/docs/useformcontext) • [Demo](https://codesandbox.io/s/react-hook-form-v7-form-context-ytudi)
  *
- * @returns return all useForm methods
+ * @returns return all createForm methods
  *
  * @example
  * ```tsx
  * function App() {
- *   const methods = useForm();
+ *   const methods = createForm();
  *   const onSubmit = data => console.log(data);
  *
  *   return (
@@ -29,34 +29,34 @@ const HookFormContext = React.createContext<UseFormReturn | null>(null)
  * }
  *
  *  function NestedInput() {
- *   const { register } = useFormContext(); // retrieve all hook methods
+ *   const { register } = createFormContext(); // retrieve all hook methods
  *   return <input {...register("test")} />;
  * }
  * ```
  */
-export const useFormContext = <
+export const createFormContext = <
   TFieldValues extends FieldValues,
   TContext = any,
   TransformedValues extends FieldValues | undefined = undefined,
->(): UseFormReturn<TFieldValues, TContext, TransformedValues> =>
-  React.useContext(HookFormContext) as UseFormReturn<
+>(): CreateFormReturn<TFieldValues, TContext, TransformedValues> =>
+  Solid.useContext(HookFormContext) as CreateFormReturn<
     TFieldValues,
     TContext,
     TransformedValues
   >
 
 /**
- * A provider component that propagates the `useForm` methods to all children components via [React Context](https://reactjs.org/docs/context.html) API. To be used with {@link useFormContext}.
+ * A provider component that propagates the `createForm` methods to all children components via [React Context](https://reactjs.org/docs/context.html) API. To be used with {@link createFormContext}.
  *
  * @remarks
  * [API](https://react-hook-form.com/docs/useformcontext) • [Demo](https://codesandbox.io/s/react-hook-form-v7-form-context-ytudi)
  *
- * @param props - all useForm methods
+ * @param props - all createForm methods
  *
  * @example
  * ```tsx
  * function App() {
- *   const methods = useForm();
+ *   const methods = createForm();
  *   const onSubmit = data => console.log(data);
  *
  *   return (
@@ -70,7 +70,7 @@ export const useFormContext = <
  * }
  *
  *  function NestedInput() {
- *   const { register } = useFormContext(); // retrieve all hook methods
+ *   const { register } = createFormContext(); // retrieve all hook methods
  *   return <input {...register("test")} />;
  * }
  * ```
@@ -84,7 +84,7 @@ export const FormProvider = <
 ) => {
   const { children, ...data } = props
   return (
-    <HookFormContext.Provider value={data as unknown as UseFormReturn}>
+    <HookFormContext.Provider value={data as unknown as CreateFormReturn}>
       {children}
     </HookFormContext.Provider>
   )

@@ -1,20 +1,20 @@
 import { createEffect, on } from 'solid-js'
 import { EVENTS } from './constants'
+import { createFormContext } from './createFormContext'
+import { createFormState } from './createFormState'
+import { createWatch } from './createWatch'
 import getEventValue from './logic/getEventValue'
 import isNameInFieldArray from './logic/isNameInFieldArray'
 import {
   ControllerFieldState,
+  CreateControllerProps,
+  CreateControllerReturn,
   Field,
   FieldPath,
   FieldPathValue,
   FieldValues,
   InternalFieldName,
-  CreateControllerProps,
-  CreateControllerReturn,
 } from './types'
-import { createFormContext } from './createFormContext'
-import { createFormState } from './createFormState'
-import { useWatch } from './useWatch'
 import cloneObject from './utils/cloneObject'
 import get from './utils/get'
 import isBoolean from './utils/isBoolean'
@@ -54,7 +54,7 @@ export function createController<
   const methods = createFormContext<TFieldValues>()
   const { name, disabled, control = methods.control, shouldUnregister } = props
   const isArrayField = isNameInFieldArray(control._names.array, name)
-  const value = useWatch({
+  const value = createWatch({
     control,
     name,
     defaultValue: get(
@@ -70,13 +70,11 @@ export function createController<
     exact: true,
   })
 
-  const _registerProps = React.useRef(
-    control.register(name, {
-      ...props.rules,
-      value,
-      ...(isBoolean(props.disabled) ? { disabled: props.disabled } : {}),
-    }),
-  )
+  const _registerProps = control.register(name, {
+    ...props.rules,
+    value,
+    ...(isBoolean(props.disabled) ? { disabled: props.disabled } : {}),
+  })
 
   createEffect(() => {
     const _shouldUnregisterField =
